@@ -37,16 +37,14 @@ I chose this design directly from my personal experience playing *Arena of Valor
 
 Standard HCI design guidelines often assume that all on-screen elements should be equally accessible. However, high-stress interaction requires **asymmetric error resilience**: vital, time-critical actions should be biomechanically effortless, while disruptive non-combat functions must require intentional, high-precision motor movement. This experiment demonstrates how Fitts' Law can be used proactively to protect users from high-arousal motor errors.
 
----
-
 ## 3. Empirical Analysis & Custom Formula
 
 ### Video Demonstration
 <!-- Embed your recorded screen trial video or insert your YouTube link below -->
-[Watch Experiment Demonstration Video](your_video_link_here)
+(https://drive.google.com/file/d/19qEwJHRBMYSZu0J9C42Gui9THX-8oTjR/view?usp=sharing)
 
 ### Regression Scatter Plot
-![Fitts' Law Regression Plot](your_plot_image.png)<img width="752" height="452" alt="image" src="https://github.com/user-attachments/assets/8a287009-de6a-4532-8a90-30df6cf64344" />
+<img width="752" height="452" alt="image" src="https://github.com/user-attachments/assets/8a287009-de6a-4532-8a90-30df6cf64344" />
 
 
 ### Custom Fitts' Law Formula
