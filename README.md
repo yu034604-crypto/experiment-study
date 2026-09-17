@@ -7,7 +7,7 @@ This project investigates asymmetric touch target design in high-intensity mobil
 
 ## 1. Scenario, Innovation, and Application
 ### Scenario & Context
-* **Scenario:** Competitive mobile MOBA games (e.g.,Arena of Valor).
+* **Scenario:** Competitive mobile MOBA games (e.g., Arena of Valor).
 * **User Context:** During critical team fights, players experience intense physiological excitement, adrenaline rush, and extreme time pressure. Players must repeatedly execute basic attacks (`ATTACK`) from a default resting finger position, while non-combat utility buttons (`CFG` / Settings, chat, scoreboard) share the same touch surface.
 
 ### Real-World HCI Problem
