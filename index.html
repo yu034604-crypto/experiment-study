@@ -21,7 +21,7 @@
 
     body {
       margin: 0;
-      padding: 16px 20px;
+      padding: 16px 20px 30px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -31,7 +31,7 @@
       user-select: none;
     }
 
-    /* 獨立高顯眼 HUD 儀表板 */
+    /* HUD Dashboard Bar */
     #hud-dashboard {
       width: 900px;
       background: #1e293b;
@@ -61,7 +61,6 @@
       font-weight: 700;
       color: #ffffff;
     }
-    /* 計時器高亮 */
     .hud-value.timer {
       color: #38bdf8;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
@@ -79,7 +78,7 @@
     #canvas {
       position: relative;
       width: 900px;
-      height: 520px;
+      height: 500px;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -192,11 +191,41 @@
       color: #4b5563;
       cursor: not-allowed;
     }
+
+    /* Scenario & Innovation Documentation Card */
+    #research-panel {
+      width: 900px;
+      margin-top: 18px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      background: #0f172a;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 16px 20px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    }
+    .research-card h3 {
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--accent);
+      margin: 0 0 6px 0;
+    }
+    .research-card p {
+      font-size: 12px;
+      line-height: 1.55;
+      color: #94a3b8;
+      margin: 0;
+    }
+    .research-card strong {
+      color: #e2e8f0;
+    }
   </style>
 </head>
 <body>
 
-  <!-- 顯眼獨立 HUD 資訊面板 (計時器、上次 MT、距離、寬度全部獨立顯示) -->
+  <!-- Live Metrics Dashboard -->
   <div id="hud-dashboard">
     <div class="hud-block">
       <div class="hud-label">Condition</div>
@@ -241,12 +270,28 @@
     </div>
   </div>
 
-  <!-- Controls Footer -->
+  <!-- Action Bar -->
   <div id="bottom-bar">
     <div id="guidance">Click <strong>Start Session</strong> to begin.</div>
     <div>
       <button id="btn-start" class="btn btn-start" onclick="initStudy()">Start Session</button>
       <button id="btn-export" class="btn btn-export" disabled onclick="exportCSV()">Export Aggregated CSV</button>
+    </div>
+  </div>
+
+  <!-- Academic Context: Scenario & Innovation -->
+  <div id="research-panel">
+    <div class="research-card">
+      <h3>Scenario & Problem</h3>
+      <p>
+        <strong>High-Arousal Mobile MOBA Combat (e.g., <em>Arena of Valor</em>):</strong> During intense, split-second team fights, players experience extreme excitement and panic tapping. Accidental slips onto adjacent non-combat buttons (e.g., settings, store, chat wheel) interrupt combat actions, leading to catastrophic team wipeouts and defeats.
+      </p>
+    </div>
+    <div class="research-card">
+      <h3>Innovation & Fitts' Law Mechanism</h3>
+      <p>
+        <strong>Asymmetric Target Sizing & Spatial Guard-Banding:</strong> Primary combat actions (<code>ATTACK</code>) are given large widths (W=96px) and placed closer to rest (A=140-210px) for rapid, error-tolerant execution. Utility buttons (<code>CFG</code>) are scaled down (W=28px) and pushed into corners to deliberately increase ID (Index of Difficulty), creating motor friction against accidental activation.
+      </p>
     </div>
   </div>
 
@@ -306,7 +351,7 @@
       subLabel.textContent = `W:${c.W}px`;
 
       const centerX = 450;
-      const centerY = 260;
+      const centerY = 250;
 
       let targetX = 0;
       let targetY = 0;
@@ -323,7 +368,7 @@
       }
 
       targetX = Math.max(20, Math.min(900 - c.W - 20, targetX));
-      targetY = Math.max(20, Math.min(520 - 45 - 20, targetY));
+      targetY = Math.max(20, Math.min(500 - 45 - 20, targetY));
 
       activeEl.style.width = `${c.W}px`;
       activeEl.style.height = `${Math.max(34, c.W * 0.6)}px`;
@@ -378,11 +423,9 @@
       const c = conditions[condIndex];
       const mt = Math.round(now - startTimestamp);
 
-      // 即時凍結與更新上次 MT
       lblTimer.textContent = `${(mt / 1000).toFixed(3)} s`;
       lblLastMt.textContent = `${mt} ms`;
 
-      // 剔除第 1 次 Warm-up
       if (clickCount > 0) {
         const id = Math.log2((2 * c.A) / c.W);
         rawRecords.push({
