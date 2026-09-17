@@ -22,7 +22,7 @@
 
     body {
       margin: 0;
-      padding: 20px;
+      padding: 16px 20px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -32,20 +32,32 @@
       user-select: none;
     }
 
-    /* Minimal Stats Bar (No big ugly title) */
+    /* Top Professional HUD Metrics Bar */
     #top-bar {
       width: 900px;
       display: flex;
-      justify-content: flex-end;
+      justify-content: space-between;
       align-items: center;
-      gap: 20px;
       font-size: 13px;
       color: var(--muted);
       margin-bottom: 10px;
+      background: #111827;
+      padding: 8px 16px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
     }
-    #top-bar span {
+    .metric-group {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+    .metric-group span {
       color: #fff;
       font-weight: 600;
+    }
+    .timer-val {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      color: var(--accent) !important;
     }
 
     /* Main Interaction Canvas */
@@ -92,6 +104,7 @@
     .hud-target {
       position: absolute;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-weight: 700;
@@ -102,8 +115,15 @@
     .hud-target:active {
       transform: scale(0.95);
     }
+    .target-sublabel {
+      font-size: 9px;
+      font-weight: 400;
+      opacity: 0.8;
+      line-height: 1;
+      margin-top: 2px;
+    }
 
-    /* Prominent Attack Button - Guaranteed safe inside canvas */
+    /* Prominent Attack Button */
     .target-attack {
       background: linear-gradient(135deg, #ea580c, #c2410c);
       color: #ffffff;
@@ -112,10 +132,10 @@
       letter-spacing: 1px;
     }
 
-    /* Compact Config Button - Positioned near edges */
+    /* Compact Config Button */
     .target-config {
       background: var(--config);
-      color: #94a3b8;
+      color: #cbd5e1;
       border: 1px solid #4b5563;
       box-shadow: 0 0 6px rgba(0,0,0,0.4);
     }
@@ -127,7 +147,7 @@
     /* Bottom Control Bar */
     #bottom-bar {
       width: 900px;
-      margin-top: 14px;
+      margin-top: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -163,18 +183,32 @@
 </head>
 <body>
 
-  <!-- Minimal Stats Bar (Top right only) -->
+  <!-- Comprehensive Real-Time Metrics Header -->
   <div id="top-bar">
-    <div>Condition: <span id="lbl-cond">Idle</span></div>
-    <div>Trials: <span id="lbl-trials">0/10</span></div>
-    <div>Misses: <span id="lbl-miss" style="color:var(--danger)">0</span></div>
+    <div class="metric-group">
+      <div>Condition: <span id="lbl-cond">Idle</span></div>
+      <div>Distance (A): <span id="lbl-dist">--</span></div>
+      <div>Width (W): <span id="lbl-width">--</span></div>
+    </div>
+    <div class="metric-group">
+      <div>Timer: <span id="lbl-timer" class="timer-val">0 ms</span></div>
+      <div>Last MT: <span id="lbl-last-mt">--</span></div>
+      <div>Trials: <span id="lbl-trials">0/10</span></div>
+      <div>Misses: <span id="lbl-miss" style="color:var(--danger)">0</span></div>
+    </div>
   </div>
 
   <!-- Interactive Arena -->
   <div id="canvas">
     <div id="rest-station">REST POSITION</div>
-    <div id="btn-attack" class="hud-target target-attack hidden">ATTACK</div>
-    <div id="btn-config" class="hud-target target-config hidden">CFG</div>
+    <div id="btn-attack" class="hud-target target-attack hidden">
+      <div>ATTACK</div>
+      <div class="target-sublabel" id="sub-attack"></div>
+    </div>
+    <div id="btn-config" class="hud-target target-config hidden">
+      <div>CFG</div>
+      <div class="target-sublabel" id="sub-config"></div>
+    </div>
   </div>
 
   <!-- Controls Footer -->
@@ -187,10 +221,9 @@
   </div>
 
   <script>
-    // Systematically controlled A & W (Guaranteed inside canvas)
-    // 9 Conditions: 3 Distances x 3 Widths
-    const distances = [140, 210, 280]; // A (px) - Safely contained within 900x520 canvas
-    const widths = [28, 54, 96];        // W (px): 28px for edge Config, 96px for Attack
+    // Variables systematically varied: 3 Distances (A) x 3 Widths (W) = 9 Conditions
+    const distances = [140, 210, 280]; // Distance from rest origin in pixels
+    const widths = [28, 54, 96];        // Target Width in pixels
     const TAPS_PER_COND = 11;          // 1st Warm-up discarded, 10 valid trials recorded
 
     let conditions = [];
@@ -201,6 +234,7 @@
     let state = 'IDLE';
     let currentRole = 'ATTACK';
     let startTimestamp = 0;
+    let timerInterval = null;
     let rawRecords = [];
     let misses = 0;
 
@@ -208,7 +242,14 @@
     const restStation = document.getElementById('rest-station');
     const btnAttack = document.getElementById('btn-attack');
     const btnConfig = document.getElementById('btn-config');
+    const subAttack = document.getElementById('sub-attack');
+    const subConfig = document.getElementById('sub-config');
+
     const lblCond = document.getElementById('lbl-cond');
+    const lblDist = document.getElementById('lbl-dist');
+    const lblWidth = document.getElementById('lbl-width');
+    const lblTimer = document.getElementById('lbl-timer');
+    const lblLastMt = document.getElementById('lbl-last-mt');
     const lblTrials = document.getElementById('lbl-trials');
     const lblMiss = document.getElementById('lbl-miss');
     const guidance = document.getElementById('guidance');
@@ -222,14 +263,19 @@
     function setupCondition() {
       const c = conditions[condIndex];
       clickCount = 0;
-      lblCond.textContent = `${condIndex + 1}/9 (A:${c.A}px, W:${c.W}px)`;
+      lblCond.textContent = `${condIndex + 1}/9`;
+      lblDist.textContent = `${c.A} px`;
+      lblWidth.textContent = `${c.W} px`;
       lblTrials.textContent = `0/10`;
 
-      // Assign role: Large is ATTACK, Small/Medium can be CONFIG
+      // Large width mapped to ATTACK; Small/Med mapped to CONFIG
       currentRole = c.W >= 70 ? 'ATTACK' : 'CONFIG';
 
       const activeEl = currentRole === 'ATTACK' ? btnAttack : btnConfig;
       const inactiveEl = currentRole === 'ATTACK' ? btnConfig : btnAttack;
+      const subLabel = currentRole === 'ATTACK' ? subAttack : subConfig;
+
+      subLabel.textContent = `${c.W}px`;
 
       const centerX = 450;
       const centerY = 260;
@@ -238,24 +284,22 @@
       let targetY = 0;
 
       if (currentRole === 'ATTACK') {
-        // ATTACK: Placed prominently in the central horizontal action zone (never cut off)
         const side = Math.random() > 0.5 ? 1 : -1;
         targetX = centerX + (side * c.A) - (c.W / 2);
-        targetY = centerY - 25; // Balanced vertically with rest station
+        targetY = centerY - 25;
       } else {
-        // CONFIG: Positioned toward the corners or upper edge to simulate peripheral settings
         const cornerX = Math.random() > 0.5 ? 1 : -1;
         const cornerY = Math.random() > 0.5 ? -1 : 1;
         targetX = centerX + (cornerX * c.A * 1.1) - (c.W / 2);
         targetY = centerY + (cornerY * c.A * 0.7) - (c.W / 2);
       }
 
-      // Strict boundaries to prevent clipping (margins of 20px)
+      // Keep safely inside bounds
       targetX = Math.max(20, Math.min(900 - c.W - 20, targetX));
       targetY = Math.max(20, Math.min(520 - 45 - 20, targetY));
 
       activeEl.style.width = `${c.W}px`;
-      activeEl.style.height = `${Math.max(32, c.W * 0.6)}px`;
+      activeEl.style.height = `${Math.max(34, c.W * 0.6)}px`;
       activeEl.style.left = `${targetX}px`;
       activeEl.style.top = `${targetY}px`;
       activeEl.style.fontSize = c.W < 35 ? '10px' : '13px';
@@ -269,6 +313,7 @@
     function setStep(next) {
       state = next;
       if (next === 'REST') {
+        clearInterval(timerInterval);
         restStation.classList.add('active');
         btnAttack.style.pointerEvents = 'none';
         btnConfig.style.pointerEvents = 'none';
@@ -277,8 +322,15 @@
         restStation.classList.remove('active');
         btnAttack.style.pointerEvents = 'auto';
         btnConfig.style.pointerEvents = 'auto';
-        guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack-glow)' : '#cbd5e1'}">[${currentRole}]</strong>`;
+        guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack-glow)' : '#cbd5e1'}">[${currentRole}]</strong> (A: ${conditions[condIndex].A}px, W: ${conditions[condIndex].W}px)`;
+        
         startTimestamp = performance.now();
+        // High-frequency live stopwatch counter
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          const elapsed = Math.round(performance.now() - startTimestamp);
+          lblTimer.textContent = `${elapsed} ms`;
+        }, 16);
       }
     }
 
@@ -290,12 +342,17 @@
     function handleTargetClick(role) {
       if (state !== 'TARGET') return;
 
+      clearInterval(timerInterval);
       const now = performance.now();
       const c = conditions[condIndex];
+      const mt = Math.round(now - startTimestamp);
+      
+      // Update real-time MT readouts
+      lblTimer.textContent = `${mt} ms`;
+      lblLastMt.textContent = `${mt} ms`;
 
       // Drop first warm-up trial
       if (clickCount > 0) {
-        const mt = Math.round(now - startTimestamp);
         const id = Math.log2((2 * c.A) / c.W);
         rawRecords.push({
           condIndex: condIndex + 1,
@@ -343,15 +400,20 @@
       btnStart.disabled = true;
       btnExport.disabled = true;
       lblMiss.textContent = '0';
+      lblLastMt.textContent = '--';
+      lblTimer.textContent = '0 ms';
       setupCondition();
     }
 
     function finishStudy() {
+      clearInterval(timerInterval);
       restStation.classList.remove('active');
       btnAttack.classList.add('hidden');
       btnConfig.classList.add('hidden');
       lblCond.textContent = "Completed";
-      guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Export aggregated data below.</span>";
+      lblDist.textContent = "--";
+      lblWidth.textContent = "--";
+      guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Export aggregated CSV below.</span>";
       btnExport.disabled = false;
     }
 
