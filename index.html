@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anti-Accidental Activation Fitts' Law Study</title>
+  <title>Anti-Accidental Activation Study</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body {
@@ -17,15 +17,15 @@
       padding: 32px 36px; background: rgba(30, 41, 59, 0.95);
       border: 1px solid #475569; border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0,0,0,0.6); text-align: center;
-      z-index: 1000; width: 460px;
+      z-index: 1000; width: 440px;
     }
-    #dashboard h2 { font-size: 20px; margin-bottom: 12px; color: #38bdf8; font-weight: 600; }
+    #dashboard h2 { font-size: 20px; margin-bottom: 12px; color: #38bdf8; }
     #dashboard p { font-size: 13px; line-height: 1.6; color: #94a3b8; margin-bottom: 18px; }
     .status-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 13px; color: #cbd5e1; }
     button.btn {
       margin-top: 18px; width: 100%; padding: 11px 16px; border: none;
       border-radius: 8px; background: #2563eb; color: white;
-      font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
+      font-size: 14px; font-weight: 600; cursor: pointer;
     }
     button.btn:hover { background: #1d4ed8; }
     #start-circle {
@@ -39,7 +39,7 @@
       position: absolute; border-radius: 6px; cursor: pointer;
       display: none; align-items: center; justify-content: center;
       font-size: 11px; font-weight: bold; color: white; z-index: 200;
-      box-shadow: 0 0 14px rgba(0, 0, 0, 0.3);
+      transform: translate(-50%, -50%);
     }
     .normal-target { background: #3b82f6; border: 1px solid #60a5fa; }
     .safeguard-target { background: #ef4444; border: 1px solid #f87171; }
@@ -59,9 +59,10 @@
   <div id="target-btn" onclick="handleTargetClick()">CONFIRM</div>
 
   <script>
+    // 距離與寬度皆嚴格控制在視窗可視範圍之內
     const conditions = [
-      { type: "Standard_UI", D: [200, 350, 500], W: [60, 90] },
-      { type: "Safeguard_UI", D: [400, 600, 750], W: [18, 30] }
+      { type: "Standard_UI", D: [200, 320, 440], W: [60, 90] },
+      { type: "Safeguard_UI", D: [200, 320, 440], W: [18, 28] }
     ];
     const repeats = 3;
 
@@ -103,27 +104,23 @@
 
       const trial = trials[currentIndex];
       const winW = window.innerWidth;
-      const winH = window.innerHeight;
       const target = document.getElementById("target-btn");
       const start = document.getElementById("start-circle");
 
-      const angle = (Math.random() * Math.PI * 0.6) + 0.2 * Math.PI;
+      // 固定在水平正中央，由上往下移動，絕對不出界
       const centerX = winW / 2;
-      const startY = winH - 120;
-      const startX = centerX;
+      const startY = 120; // 螢幕上方
+      const targetY = startY + trial.D; // 依距離 D 垂直往下
 
-      const targetX = startX + Math.cos(angle) * trial.D * (Math.random() > 0.5 ? 1 : -1);
-      const targetY = startY - Math.sin(angle) * trial.D;
-
-      start.style.left = `${startX}px`;
+      start.style.left = `${centerX}px`;
       start.style.top = `${startY}px`;
       start.style.display = "flex";
 
       target.className = trial.type === "Safeguard_UI" ? "safeguard-target" : "normal-target";
-      target.innerText = trial.type === "Safeguard_UI" ? "DELETE" : "SAVE";
+      target.innerText = trial.type === "Safeguard_UI" ? "DEL" : "SAVE";
       target.style.width = `${trial.W}px`;
       target.style.height = `${trial.W}px`;
-      target.style.left = `${targetX}px`;
+      target.style.left = `${centerX}px`;
       target.style.top = `${targetY}px`;
       target.style.display = "none";
     }
