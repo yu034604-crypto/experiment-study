@@ -33,7 +33,7 @@ Under high stress and rapid tapping, players frequently suffer from motor slips 
 
 ## 2. Why I Chose This Design?
 
-I chose this design directly from my personal experience playing *Arena of Valor* (*傳說對決*). During crucial team fights, intense excitement and panic tapping often lead to accidental slips onto adjacent non-combat buttons—such as settings or the chat wheel—instantly causing team wipeouts and defeats. 
+I chose this design directly from my personal experience playing *Arena of Valor*. During crucial team fights, intense excitement and panic tapping often lead to accidental slips onto adjacent non-combat buttons—such as settings or the chat wheel—instantly causing team wipeouts and defeats. 
 
 Standard HCI design guidelines often assume that all on-screen elements should be equally accessible. However, high-stress interaction requires **asymmetric error resilience**: vital, time-critical actions should be biomechanically effortless, while disruptive non-combat functions must require intentional, high-precision motor movement. This experiment demonstrates how Fitts' Law can be used proactively to protect users from high-arousal motor errors.
 
