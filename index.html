@@ -74,7 +74,7 @@
       font-size: 16px;
     }
 
-    /* Main Interaction Canvas */
+    /* Main Canvas */
     #canvas {
       position: relative;
       width: 900px;
@@ -86,7 +86,7 @@
       box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
     }
 
-    /* Center Rest Position */
+    /* Center Rest Station */
     #rest-station {
       position: absolute;
       top: 50%;
@@ -199,7 +199,7 @@
 </head>
 <body>
 
-  <!-- 1. Real-Time HUD Dashboard -->
+  <!-- Live Dashboard -->
   <div id="hud-dashboard">
     <div class="hud-block">
       <div class="hud-label">Condition</div>
@@ -231,7 +231,7 @@
     </div>
   </div>
 
-  <!-- 2. Interactive Arena -->
+  <!-- Main Canvas -->
   <div id="canvas">
     <div id="rest-station">REST POSITION</div>
     <div id="btn-attack" class="hud-target target-attack hidden">
@@ -244,7 +244,7 @@
     </div>
   </div>
 
-  <!-- 3. Control Footer -->
+  <!-- Bottom Control -->
   <div id="bottom-bar">
     <div id="guidance">Click <strong>Start Session</strong> to begin.</div>
     <div>
@@ -253,7 +253,7 @@
     </div>
   </div>
 
-  <!-- 4. Academic Context: Scenario & Innovation -->
+  <!-- Academic Scenario & Innovation Panel -->
   <div id="research-panel">
     <div class="research-card">
       <h3>Scenario & Real-World HCI Problem</h3>
@@ -264,17 +264,15 @@
     <div class="research-card">
       <h3>Innovation & Fitts' Law Mechanism</h3>
       <p>
-        <strong>Asymmetric Target Sizing & Spatial Guard-Banding:</strong> The critical <code>ATTACK</code> button is given a large width (W=96px) for rapid, error-tolerant tapping. Non-combat utility buttons (<code>CFG</code>) are downsized (W=28px or 54px) across distances (A=140px to 280px) and pushed to peripheral corners to deliberately increase ID (Index of Difficulty), creating motor friction to prevent accidental triggers.
+        <strong>Asymmetric Target Sizing & Spatial Guard-Banding:</strong> Primary combat actions (<code>ATTACK</code>) are given a large width (W=96px) for rapid, error-tolerant tapping. Utility buttons (<code>CFG</code>) are downsized (W=28px or 54px) across varying distances (A=140px to 280px) and pushed to peripheral corners to deliberately increase ID (Index of Difficulty), creating motor friction against accidental activation.
       </p>
     </div>
   </div>
 
   <script>
-    // Variables systematically varied: 3 Distances (A) x 3 Widths (W) = 9 Conditions
-    // CFG uses W = 28px, 54px; ATTACK uses W = 96px; Distance A ranges 140px - 280px
     const distances = [140, 210, 280]; 
     const widths = [28, 54, 96]; 
-    const TAPS_PER_COND = 11; // 1st Warm-up discarded, 10 valid trials recorded
+    const TAPS_PER_COND = 11;
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
@@ -318,7 +316,6 @@
       lblWidth.textContent = `${c.W} px`;
       lblTrials.textContent = `0/10`;
 
-      // Assign role: W=28 or 54 -> CFG; W=96 -> ATTACK
       currentRole = c.W <= 54 ? 'CFG' : 'ATTACK';
 
       const activeEl = currentRole === 'ATTACK' ? btnAttack : btnConfig;
@@ -338,7 +335,6 @@
         targetX = centerX + (side * c.A) - (c.W / 2);
         targetY = centerY - 25;
       } else {
-        // CFG placed towards edge/corners across A=140-280px
         const cornerX = Math.random() > 0.5 ? 1 : -1;
         const cornerY = Math.random() > 0.5 ? -1 : 1;
         targetX = centerX + (cornerX * c.A * 1.05) - (c.W / 2);
