@@ -104,7 +104,7 @@
 <body>
   <div id="dashboard">
     <h2>Screen-Edge Fitts' Law Study</h2>
-    <p>Press <strong>F11</strong> for Fullscreen mode before starting. Click the green <strong>START</strong> anchor, then acquire the red <strong>TARGET</strong> bar as quickly and accurately as possible.</p>
+    <p>Press <strong>F11</strong> for Fullscreen mode before starting. Click the green <strong>START</strong> anchor, then move downwards to acquire the red <strong>TARGET</strong> bar as quickly and accurately as possible.</p>
     <div class="status-row"><span>Status:</span><strong id="condition-text">Ready</strong></div>
     <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 54</strong></div>
     <button id="start-btn" class="btn" onclick="startExperiment()">Start Experiment</button>
@@ -115,8 +115,8 @@
   <div id="target-bar" onclick="handleTargetClick()">TARGET</div>
 
   <script>
-    const distances = [250, 420, 600]; // Movement distance in pixels (D)
-    const widths = [24, 48, 80];        // Target height in pixels (W)
+    const distances = [250, 420, 600]; // 垂直距離 (px)
+    const widths = [24, 48, 80];        // 目標條厚度 (px)
     const conditions = ["Edge", "Floating"];
     const repeats = 3;
 
@@ -136,7 +136,7 @@
           });
         });
       });
-      // Random shuffle
+      // 隨機排列 (Shuffle)
       for (let i = trials.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [trials[i], trials[j]] = [trials[j], trials[i]];
@@ -159,12 +159,19 @@
 
       const trial = trials[currentIndex];
       const winW = window.innerWidth;
+      const winH = window.innerHeight;
       const targetBar = document.getElementById("target-bar");
       const startCircle = document.getElementById("start-circle");
 
       const barWidth = 360;
       const targetX = (winW - barWidth) / 2;
-      const targetY = trial.condition === "Edge" ? 0 : 80;
+
+      // 目標移到螢幕底端：
+      // Edge: 貼死視窗最底 (winH - trial.W)
+      // Floating: 離底端懸空 80px (winH - trial.W - 80)
+      const targetY = trial.condition === "Edge" 
+        ? (winH - trial.W) 
+        : (winH - trial.W - 80);
 
       targetBar.style.left = `${targetX}px`;
       targetBar.style.top = `${targetY}px`;
@@ -172,9 +179,10 @@
       targetBar.style.height = `${trial.W}px`;
       targetBar.style.display = "none";
 
+      // 起點在上方，由上往下移動距離 D
       const targetCenterY = targetY + trial.W / 2;
       const startX = winW / 2;
-      const startY = targetCenterY + trial.D;
+      const startY = targetCenterY - trial.D;
 
       startCircle.style.left = `${startX}px`;
       startCircle.style.top = `${startY}px`;
