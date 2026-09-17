@@ -1,7 +1,4 @@
 # Fitts's law experiment study
-An empirical Fitts's law study evaluating the screen-edge effect on target acquisition time.
-
-
 This project investigates asymmetric touch target design in high-intensity mobile MOBA (Multiplayer Online Battle Arena) gaming using Fitts' Law. It empirically validates how sizing and spatial layout prevent game-losing accidental clicks during high-adrenaline combat.
 
 - **Live Experiment Application:** [https://yu034604-crypto.github.io/fitts-law-study/](https://yu034604-crypto.github.io/fitts-law-study/)
@@ -10,7 +7,7 @@ This project investigates asymmetric touch target design in high-intensity mobil
 
 ## 1. Scenario, Innovation, and Application
 
-### Scenario & Context
+### Scenario
 * **Context:** Competitive mobile MOBA games (e.g., *Arena of Valor* / *Honor of Kings*).
 * **User State:** During high-stakes team fights, players experience intense physiological arousal, adrenaline rush, and extreme time pressure. Every split second determines victory or defeat. Players must repeatedly execute basic attacks (`ATTACK`) from a default resting finger position, while non-combat utility buttons (such as settings, shop, scoreboard, or chat emotes) occupy nearby interface space.
 
@@ -31,7 +28,7 @@ When players enter high-stress combat, adrenaline and rapid tapping cause motor 
 
 ---
 
-## 2. Why Choose This Design?
+## 2. Why I Chose This Design?
 
 I chose this design directly from my personal experience playing *Arena of Valor* (*傳說對決*). During crucial team fights, intense excitement and panic tapping often lead to accidental slips onto adjacent non-combat buttons—such as settings or the chat wheel—instantly causing team wipeouts and defeats. 
 
