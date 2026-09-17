@@ -46,9 +46,6 @@ Standard HCI design guidelines often assume that all on-screen elements should b
 
 ### Custom Fitts' Law Formula
 Empirical regression derived from 9 randomized conditions (90 valid clicks aggregated into Mean Movement Time):
-
-$$MT = a + b \cdot ID$$
-
 $$MT = 57.64 + 139.21 \cdot \log_2\left(\frac{2A}{W}\right)$$
 
 * **Intercept ($a$):** $57.64\text{ ms}$ (baseline sensory-motor initiation delay)
