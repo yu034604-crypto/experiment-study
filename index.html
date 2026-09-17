@@ -9,7 +9,9 @@
       --panel: #111827;
       --panel-border: #1f2937;
       --attack: #ea580c;
-      --audio: #475569;
+      --attack-border: #fdba74;
+      --audio: #334155;
+      --audio-border: #64748b;
       --text: #f3f4f6;
       --muted: #9ca3af;
       --accent: #38bdf8;
@@ -53,7 +55,7 @@
     #game-canvas {
       position: relative;
       width: 900px;
-      height: 520px;
+      height: 540px;
       background: var(--panel);
       border: 1px solid var(--panel-border);
       border-radius: 8px;
@@ -64,11 +66,11 @@
     /* Center Rest / Origin Station */
     #rest-station {
       position: absolute;
-      top: 50%;
+      top: 55%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 140px;
-      height: 48px;
+      width: 130px;
+      height: 46px;
       background: #1f2937;
       border: 1px solid #374151;
       border-radius: 6px;
@@ -93,8 +95,6 @@
     /* Target Buttons */
     .hud-target {
       position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -104,20 +104,25 @@
       transition: transform 0.05s ease;
     }
     .hud-target:active {
-      transform: translateY(-50%) scale(0.96);
+      transform: scale(0.95);
     }
 
+    /* ATTACK Button: Highly visible, centered combat area */
     .target-attack {
-      background: var(--attack);
+      background: linear-gradient(135deg, #f97316, #ea580c);
       color: #ffffff;
-      border: 1px solid #fdba74;
-      box-shadow: 0 0 12px rgba(234, 88, 12, 0.35);
+      border: 2px solid var(--attack-border);
+      box-shadow: 0 0 16px rgba(234, 88, 12, 0.45);
+      letter-spacing: 1px;
     }
-    .target-audio {
+
+    /* SETTINGS Button: Compact, edge-positioned anti-misclick target */
+    .target-settings {
       background: var(--audio);
-      color: #e2e8f0;
-      border: 1px solid #64748b;
-      box-shadow: 0 0 8px rgba(100, 116, 139, 0.2);
+      color: #cbd5e1;
+      border: 1px solid var(--audio-border);
+      box-shadow: 0 0 8px rgba(100, 116, 139, 0.25);
+      letter-spacing: 0.5px;
     }
 
     .hidden {
@@ -163,7 +168,7 @@
 </head>
 <body>
 
-  <!-- Minimal Stats Row -->
+  <!-- Top Stats Bar -->
   <div id="top-bar">
     <div>Condition: <span id="lbl-cond">Idle</span></div>
     <div>Trials: <span id="lbl-trials">0/10</span></div>
@@ -174,7 +179,7 @@
   <div id="game-canvas">
     <div id="rest-station">REST POSITION</div>
     <div id="btn-attack" class="hud-target target-attack hidden">ATTACK</div>
-    <div id="btn-audio" class="hud-target target-audio hidden">AUDIO</div>
+    <div id="btn-settings" class="hud-target target-settings hidden">CONFIG</div>
   </div>
 
   <!-- Footer Actions -->
@@ -187,9 +192,12 @@
   </div>
 
   <script>
-    const distances = [160, 300, 460];
-    const widths = [28, 56, 100]; // 28px Audio (Small), 100px Attack (Large)
-    const TAPS_PER_COND = 11;     // 1st warmup dropped, 10 recorded
+    // Independent Variables:
+    // A: Amplitude distance from center rest station
+    // W: Target width (Attack utilizes prominent W; Config utilizes small W)
+    const distances = [150, 260, 360];
+    const widths = [26, 52, 96]; // Small 26px (Config), Prominent 96px (Attack)
+    const TAPS_PER_COND = 11;    // 1st Warm-up discarded, 10 valid taps recorded
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
@@ -205,7 +213,7 @@
     const canvas = document.getElementById('game-canvas');
     const restStation = document.getElementById('rest-station');
     const btnAttack = document.getElementById('btn-attack');
-    const btnAudio = document.getElementById('btn-audio');
+    const btnSettings = document.getElementById('btn-settings');
     const lblCond = document.getElementById('lbl-cond');
     const lblTrials = document.getElementById('lbl-trials');
     const lblMiss = document.getElementById('lbl-miss');
@@ -223,18 +231,41 @@
       lblCond.textContent = `${condIndex + 1}/9 (A:${c.A}px, W:${c.W}px)`;
       lblTrials.textContent = `0/10`;
 
-      currentRole = c.W <= 56 ? 'AUDIO' : 'ATTACK';
+      // Small width represents peripheral Setting/Config; Large represents Primary Attack
+      currentRole = c.W <= 52 ? 'CONFIG' : 'ATTACK';
 
-      const side = Math.random() > 0.5 ? 1 : -1;
-      const targetCenterX = 450 + (side * c.A);
+      const activeEl = currentRole === 'ATTACK' ? btnAttack : btnSettings;
+      const inactiveEl = currentRole === 'ATTACK' ? btnSettings : btnAttack;
 
-      const activeEl = currentRole === 'ATTACK' ? btnAttack : btnAudio;
-      const inactiveEl = currentRole === 'ATTACK' ? btnAudio : btnAttack;
+      // Rest station center coordinates
+      const restCenterX = 450;
+      const restCenterY = 540 * 0.55;
+
+      let targetX = 0;
+      let targetY = 0;
+
+      if (currentRole === 'ATTACK') {
+        // ATTACK: Kept within prominent combat field (comfortably offset from center, not touching canvas edges)
+        const side = Math.random() > 0.5 ? 1 : -1;
+        targetX = restCenterX + (side * c.A) - (c.W / 2);
+        targetY = restCenterY - (c.W * 0.35);
+      } else {
+        // CONFIG: Biased towards the upper periphery/edge corner to simulate game setting icons
+        const cornerSide = Math.random() > 0.5 ? 1 : -1;
+        targetX = restCenterX + (cornerSide * c.A) - (c.W / 2);
+        // Positioned higher up near the edge
+        targetY = Math.max(30, restCenterY - c.A * 0.75);
+      }
+
+      // Constrain within visible canvas boundaries
+      targetX = Math.max(15, Math.min(900 - c.W - 15, targetX));
+      targetY = Math.max(15, Math.min(540 - Math.max(30, c.W * 0.6) - 15, targetY));
 
       activeEl.style.width = `${c.W}px`;
-      activeEl.style.height = `${Math.max(34, c.W * 0.65)}px`;
-      activeEl.style.left = `${targetCenterX - (c.W / 2)}px`;
-      activeEl.style.fontSize = c.W < 35 ? '10px' : '12px';
+      activeEl.style.height = `${Math.max(30, c.W * 0.65)}px`;
+      activeEl.style.left = `${targetX}px`;
+      activeEl.style.top = `${targetY}px`;
+      activeEl.style.fontSize = c.W < 35 ? '9px' : '13px';
       activeEl.classList.remove('hidden');
 
       inactiveEl.classList.add('hidden');
@@ -247,12 +278,12 @@
       if (next === 'REST') {
         restStation.classList.add('active');
         btnAttack.style.pointerEvents = 'none';
-        btnAudio.style.pointerEvents = 'none';
+        btnSettings.style.pointerEvents = 'none';
         guidance.textContent = "Click [REST POSITION] to center cursor.";
       } else {
         restStation.classList.remove('active');
         btnAttack.style.pointerEvents = 'auto';
-        btnAudio.style.pointerEvents = 'auto';
+        btnSettings.style.pointerEvents = 'auto';
         guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack)' : '#cbd5e1'}">[${currentRole}]</strong>`;
         startTimestamp = performance.now();
       }
@@ -269,7 +300,7 @@
       const now = performance.now();
       const c = conditions[condIndex];
 
-      // Exclude 1st warmup click
+      // Discard 1st warmup click; accumulate remaining 10 valid trials
       if (clickCount > 0) {
         const mt = Math.round(now - startTimestamp);
         const id = Math.log2((2 * c.A) / c.W);
@@ -299,9 +330,9 @@
     }
 
     btnAttack.addEventListener('mousedown', () => handleTargetClick('ATTACK'));
-    btnAudio.addEventListener('mousedown', () => handleTargetClick('AUDIO'));
+    btnSettings.addEventListener('mousedown', () => handleTargetClick('CONFIG'));
 
-    // Miss clicks on empty background
+    // Accidental clicks on empty canvas background
     canvas.addEventListener('mousedown', (e) => {
       if (state === 'TARGET' && e.target === canvas) {
         misses++;
@@ -325,7 +356,7 @@
     function finishStudy() {
       restStation.classList.remove('active');
       btnAttack.classList.add('hidden');
-      btnAudio.classList.add('hidden');
+      btnSettings.classList.add('hidden');
       lblCond.textContent = "Completed";
       guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Export aggregated data below.</span>";
       btnExport.disabled = false;
@@ -351,7 +382,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = "hud_fitts_law_aggregated.csv";
+      a.download = "action_game_hud_fitts_law.csv";
       a.click();
     }
   </script>
