@@ -6,25 +6,28 @@ This project investigates asymmetric touch target design in high-intensity mobil
 ---
 
 ## 1. Scenario, Innovation, and Application
-
-### Scenario
-* **Context:** Competitive mobile MOBA games (e.g., *Arena of Valor* / *Honor of Kings*).
-* **User State:** During high-stakes team fights, players experience intense physiological arousal, adrenaline rush, and extreme time pressure. Every split second determines victory or defeat. Players must repeatedly execute basic attacks (`ATTACK`) from a default resting finger position, while non-combat utility buttons (such as settings, shop, scoreboard, or chat emotes) occupy nearby interface space.
+### Scenario & Context
+* **Context:** Competitive mobile MOBA games (e.g., *Arena of Valor / 傳說對決*).
+* **User Context:** During critical team fights, players experience intense physiological excitement, adrenaline rush, and extreme time pressure. Players must repeatedly execute basic attacks (`ATTACK`) from a default resting finger position, while non-combat utility buttons (`CFG` / Settings, chat, scoreboard) share the same touch surface.
 
 ### Real-World HCI Problem
-When players enter high-stress combat, adrenaline and rapid tapping cause motor tremors, visual tunnel vision, and spatial overshooting ("fat-finger" errors). In mobile MOBAs like *Arena of Valor*, accidentally tapping a non-combat button (e.g., opening the settings menu, store overlay, or chat window) instead of the attack button instantly interrupts basic attack combos, leading to disastrous in-game wipeouts and defeats.
+Under high stress and rapid tapping, players frequently suffer from motor slips and "fat-finger" errors. In games like *Arena of Valor*, accidentally tapping a non-combat button instead of the attack button interrupts attack combos or brings up menus, directly resulting in team wipeouts and defeats.
 
-### Innovation: Asymmetric Spatial & Target Biasing
-* **Biased Target Dimensions:** The critical `ATTACK` button is made significantly larger ($W = 96\text{ px}$) and highly prominent to provide maximum error tolerance during rapid, high-frequency tapping. Conversely, non-combat utility buttons (`CONFIG` / Settings) are drastically miniaturized ($W = 28\text{ px}$).
-* **Distance Stratification:** The `ATTACK` button is positioned closer to the default resting position ($A = 140\text{ px} - 210\text{ px}$), enabling rapid motor reflex execution. The non-combat button is placed farther away ($A = 280\text{ px}$) toward the peripheral corners.
-* **Fitts' Law Asymmetry:** By deliberately driving up the Index of Difficulty ($ID = \log_2(2A/W)$) for non-combat buttons through smaller width and longer travel distance, the interface imposes deliberate motor friction, preventing accidental triggers without disabling functional access.
+### Innovation: Asymmetric Target Sizing & Distance Stratification
+* **Asymmetric Target Dimensions:** 
+  * The critical `ATTACK` button is large ($W = 96\text{ px}$) to provide maximum error tolerance during rapid combat tapping.
+  * Non-combat utility buttons (`CFG`) are downsized ($W = 28\text{ px}$ or $54\text{ px}$) to reduce their touchable surface area.
+* **Distance Stratification:** 
+  * Target distances from the resting position vary systematically across $A = 140\text{ px}, 210\text{ px}, 280\text{ px}$.
+  * `ATTACK` targets remain within the central action zone, whereas `CFG` targets are pushed toward peripheral edges and corners.
+* **Fitts' Law Mechanism:** By intentionally elevating the Index of Difficulty ($ID = \log_2(2A/W)$) for `CFG` through reduced width and peripheral placement, the layout creates physical motor friction that naturally prevents accidental triggers.
 
-### Application & Potential Real-World Extensions
-* **Current Experimental App:** A single-page interactive canvas that mimics a mobile MOBA combat station with an origin resting point, 9 randomized $A \times W$ conditions, real-time miss logging, and aggregated Mean Movement Time (MT) export.
-* **Broad Real-World Applications:**
-  1. **Mobile Gaming Controls (MOBA / FPS):** Differentiating primary fire/attack buttons from secondary utility buttons (reload, chat, surrender, store) to protect competitive play.
-  2. **Automotive Cockpit Touchscreens:** Making emergency hazard lights and climate toggle buttons large and close to the driver's resting hand position, while making vehicle configuration menus smaller and positioned further away to prevent accidental glances or touches while driving.
-  3. **Emergency Dispatch & Medical UI:** Designing primary dispatch/defibrillator triggers with low $ID$ (large, accessible) and destructive reset/abort buttons with high $ID$ (small, edge-aligned) to avoid fatal operational slips under crisis.
+### Application & Real-World Extensions
+* **Current Experimental Tool:** A responsive web application featuring real-time millisecond stopwatch timing, live MT display, dynamic $A$ & $W$ parameters, 9 randomized conditions, and aggregated CSV data export.
+* **Real-World Extensions:**
+  1. **Mobile Gaming (MOBA / FPS):** Prioritizing primary fire buttons over sensitive reload, store, or surrender controls.
+  2. **Automotive Cockpit Touchscreens:** Making primary defroster/hazard controls large and near the hand rest, while placing deep system settings far away and small to prevent distracted driving slips.
+  3. **Medical & Emergency Interfaces:** Designing critical shock/inject triggers with low $ID$ and abort/reset functions with high $ID$ to eliminate fatal slips under crisis.
 
 ---
 
@@ -38,7 +41,7 @@ Standard HCI design guidelines often assume that all on-screen elements should b
 
 ### Video Demonstration
 <!-- Embed your recorded screen trial video or insert your YouTube link below -->
-(https://drive.google.com/file/d/19qEwJHRBMYSZu0J9C42Gui9THX-8oTjR/view?usp=sharing)
+()
 
 ### Regression Scatter Plot
 <img width="752" height="452" alt="image" src="https://github.com/user-attachments/assets/8a287009-de6a-4532-8a90-30df6cf64344" />
