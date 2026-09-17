@@ -41,11 +41,10 @@ Standard HCI design guidelines often assume that all on-screen elements should b
 
 ### Video Demonstration
 <!-- Embed your recorded screen trial video or insert your YouTube link below -->
-(https://drive.google.com/file/d/1pwpxje37OyZS_tvS6bQkjMjpm3gTFgZy/view?usp=drive_link)
+https://github.com/user-attachments/assets/8ce11e26-7a43-4130-9949-f47b2f64c691
 
 ### Regression Scatter Plot
 <img width="500" height="350" alt="image" src="https://github.com/user-attachments/assets/eb3371ea-3117-4202-ad82-734a43f1e531" />
-
 
 ### Custom Fitts' Law Formula
 Empirical regression derived from 9 randomized conditions (90 valid clicks aggregated into Mean Movement Time):
