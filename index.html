@@ -1,173 +1,613 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Anti-Accidental Activation Study</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
-    body {
-      width: 100vw; height: 100vh; overflow: hidden;
-      background-color: #0f172a; color: #f8fafc;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      position: relative;
-    }
-    #dashboard {
-      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-      padding: 32px 36px; background: rgba(30, 41, 59, 0.95);
-      border: 1px solid #475569; border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.6); text-align: center;
-      z-index: 1000; width: 440px;
-    }
-    #dashboard h2 { font-size: 20px; margin-bottom: 12px; color: #38bdf8; }
-    #dashboard p { font-size: 13px; line-height: 1.6; color: #94a3b8; margin-bottom: 18px; }
-    .status-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 13px; color: #cbd5e1; }
-    button.btn {
-      margin-top: 18px; width: 100%; padding: 11px 16px; border: none;
-      border-radius: 8px; background: #2563eb; color: white;
-      font-size: 14px; font-weight: 600; cursor: pointer;
-    }
-    button.btn:hover { background: #1d4ed8; }
-    #start-circle {
-      position: absolute; width: 50px; height: 50px; border-radius: 50%;
-      background: #10b981; transform: translate(-50%, -50%);
-      cursor: pointer; display: none; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: bold; color: white; z-index: 200;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-    }
-    #target-btn {
-      position: absolute; border-radius: 10px; cursor: pointer;
-      display: none; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: bold; color: white; z-index: 200;
-      transform: translate(-50%, -50%);
-    }
-    .normal-target { background: #3b82f6; border: 2px solid #60a5fa; }
-    .safeguard-target { background: #ef4444; border: 2px solid #f87171; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>觸控準確度實驗｜高齡者服藥確認按鈕的 Fitts' Law 研究</title>
+<style>
+  :root{
+    --bg: #F6F4EF;
+    --panel: #FFFFFF;
+    --ink: #22303A;
+    --ink-soft: #5B6B74;
+    --teal: #0F6E63;
+    --teal-dark: #0B5148;
+    --amber: #E0A526;
+    --amber-dark: #B9840F;
+    --line: #DCD8CC;
+    --miss: #C24B3F;
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family: -apple-system, "Segoe UI", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    line-height:1.6;
+    padding: 32px 20px 80px;
+  }
+  .wrap{ max-width: 980px; margin: 0 auto; }
+  header{ margin-bottom: 28px; }
+  header h1{
+    font-family: Georgia, "Noto Serif TC", serif;
+    font-weight: 600;
+    font-size: clamp(24px, 3vw, 32px);
+    margin: 0 0 10px;
+    color: var(--teal-dark);
+  }
+  header p{
+    max-width: 68ch;
+    color: var(--ink-soft);
+    font-size: 15.5px;
+    margin: 4px 0;
+  }
+  .panel{
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .intro-grid{ display:flex; gap:24px; flex-wrap:wrap; }
+  .intro-grid .col{ flex: 1 1 260px; }
+  .intro-grid h3{ margin: 0 0 6px; font-size: 15px; color: var(--teal-dark); }
+  .intro-grid p{ margin:0; color: var(--ink-soft); font-size: 14.5px; }
+  label{ display:block; font-size: 14px; color: var(--ink-soft); margin-bottom: 6px; }
+  input[type=number]{
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    font-size: 15px;
+    background: #FBFAF7;
+  }
+  .config-grid{ display:grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap:16px; margin: 16px 0 8px; }
+  button{
+    font-size: 15.5px;
+    font-weight: 600;
+    padding: 12px 22px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+    transition: transform .08s ease, background .15s ease;
+  }
+  button:active{ transform: scale(0.97); }
+  .btn-primary{ background: var(--teal); color:#fff; }
+  .btn-primary:hover{ background: var(--teal-dark); }
+  .btn-secondary{ background: transparent; color: var(--teal-dark); border: 1.5px solid var(--teal); }
+  .btn-secondary:hover{ background: rgba(15,110,99,0.08); }
+  #stage-panel{ display:none; }
+  #stage-panel.active{ display:block; }
+  .hud{
+    display:flex; justify-content: space-between; align-items: baseline;
+    flex-wrap: wrap; gap: 10px 24px;
+    margin-bottom: 14px; font-size: 14.5px; color: var(--ink-soft);
+  }
+  .hud b{ color: var(--ink); font-variant-numeric: tabular-nums; }
+  #canvasHost{
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    background: #EFEDE4;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    touch-action: none;
+  }
+  canvas{ display:block; width:100%; height:100%; cursor: crosshair; }
+  .flash{
+    position:absolute; inset:0; pointer-events:none;
+    background: rgba(194,75,63,0.18);
+    opacity:0; transition: opacity .12s ease;
+  }
+  .flash.show{ opacity:1; }
+  #results-panel{ display:none; }
+  #results-panel.active{ display:block; }
+  table{ width:100%; border-collapse: collapse; font-size: 13.5px; margin-top: 10px; }
+  th,td{ text-align:left; padding: 7px 10px; border-bottom: 1px solid var(--line); }
+  th{ color: var(--ink-soft); font-weight:600; }
+  tr.miss td{ color: var(--miss); }
+  .stat-row{ display:flex; gap: 24px; flex-wrap:wrap; margin: 6px 0 4px; }
+  .stat{ background:#FBFAF7; border:1px solid var(--line); border-radius:10px; padding:12px 18px; min-width:150px; }
+  .stat .n{ font-size: 22px; font-weight:700; color: var(--teal-dark); font-variant-numeric: tabular-nums; }
+  .stat .l{ font-size:12.5px; color: var(--ink-soft); }
+  #chartHost{ width:100%; margin-top:10px; }
+  .action-row{ display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
+  footer{ text-align:center; color: var(--ink-soft); font-size:13px; margin-top: 30px; }
+  .badge{
+    display:inline-block; background: rgba(224,165,38,0.18); color: var(--amber-dark);
+    border-radius: 100px; padding: 2px 10px; font-size: 12.5px; font-weight:600; margin-left:8px;
+  }
+</style>
 </head>
 <body>
-  <div id="dashboard">
-    <h2>Anti-Accidental Activation Study</h2>
-    <p>Press <strong>F11</strong> for Fullscreen mode. Click the green <strong>START</strong> anchor, then acquire the <strong>TARGET</strong> button as quickly and accurately as possible.</p>
-    <div class="status-row"><span>Status:</span><strong id="condition-text">Ready</strong></div>
-    <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 24</strong></div>
-    <button id="start-btn" class="btn" onclick="startExperiment()">Start Experiment</button>
-    <button id="export-btn" class="btn" style="display:none; background:#059669;" onclick="exportCSV()">Download Dataset (CSV)</button>
-  </div>
+<div class="wrap">
 
-  <div id="start-circle" onclick="handleStartClick()">START</div>
-  <div id="target-btn" onclick="handleTargetClick()">CONFIRM</div>
+  <header>
+    <h1>觸控準確度實驗：高齡者「已服藥」確認按鈕大小研究</h1>
+    <p>情境：長者在平板上點擊「已服藥」確認鈕，畫面上散布著其他 App 圖示（如同真實的主畫面）。本實驗系統性地改變按鈕大小（W）與按鈕距離上一個點擊點的距離（A），並測量移動時間（Movement Time）與誤觸情形，藉此推導出 Fitts' Law 的經驗公式，幫助我們決定：確認鈕究竟該多大、能容忍多少誤差，才能讓長者又快又準地點到它。</p>
+  </header>
 
-  <script>
-    // 尺寸大幅放大倍增：Standard (120px, 200px)、Safeguard (60px, 90px)
-    // 距離梯度大幅拉開：180px 到 620px
-    const conditions = [
-      { type: "Standard_UI", D: [180, 360, 560], W: [120, 200] },
-      { type: "Safeguard_UI", D: [220, 420, 620], W: [60, 90] }
-    ];
-    const repeats = 2; // 總題數降至 24 題，不累且數據穩
+  <!-- INTRO / CONFIG -->
+  <section class="panel" id="intro-panel">
+    <div class="intro-grid">
+      <div class="col">
+        <h3>任務規則</h3>
+        <p>畫面中會出現一個<b>綠色圓形按鈕</b>（目標），請用滑鼠／觸控盡快且準確地點擊它。點擊後，下一個按鈕會立刻出現在新的位置，請持續作答直到所有測試回合結束。</p>
+      </div>
+      <div class="col">
+        <h3>變項設計</h3>
+        <p>目標距離 A（像素）與目標寬度 W（像素）會依照下方設定組合，並以隨機順序出現，每個組合重複作答數次，以降低練習效應與順序效應的影響。</p>
+      </div>
+      <div class="col">
+        <h3>資料輸出</h3>
+        <p>實驗結束後，系統會列出每一回合的 A、W、ID（難度指標）與 MT（移動時間），並可一鍵匯出成 CSV，供你在 Excel／Python 中繪製 MT–ID 散佈圖與回歸分析。</p>
+      </div>
+    </div>
 
-    let trials = [];
-    let currentIndex = -1;
-    let startTime = 0;
-    let dataset = [];
+    <div class="config-grid">
+      <div>
+        <label>目標距離 A（px，以逗號分隔）</label>
+        <input type="text" id="cfgA" value="200,350,500">
+      </div>
+      <div>
+        <label>目標寬度 W（px，以逗號分隔）</label>
+        <input type="text" id="cfgW" value="40,65,100">
+      </div>
+      <div>
+        <label>每個 A×W 組合重複次數</label>
+        <input type="number" id="cfgReps" value="3" min="1" max="10">
+      </div>
+      <div>
+        <label>畫面干擾圖示數量</label>
+        <input type="number" id="cfgDistract" value="10" min="0" max="30">
+      </div>
+    </div>
 
-    function buildTrials() {
-      trials = [];
-      conditions.forEach(c => {
-        c.D.forEach(d => {
-          c.W.forEach(w => {
-            for (let r = 0; r < repeats; r++) {
-              trials.push({ type: c.type, D: d, W: w });
-            }
-          });
-        });
+    <div class="action-row">
+      <button class="btn-primary" id="startBtn">開始實驗</button>
+    </div>
+  </section>
+
+  <!-- STAGE -->
+  <section class="panel" id="stage-panel">
+    <div class="hud">
+      <div>回合 <b id="hudTrial">0 / 0</b></div>
+      <div>目前條件　A = <b id="hudA">-</b> px　W = <b id="hudW">-</b> px　ID = <b id="hudID">-</b> bits</div>
+      <div>剛才反應 <b id="hudLast">-</b></div>
+    </div>
+    <div id="canvasHost">
+      <canvas id="stage"></canvas>
+      <div class="flash" id="flashLayer"></div>
+    </div>
+  </section>
+
+  <!-- RESULTS -->
+  <section class="panel" id="results-panel">
+    <h3 style="margin-top:0;color:var(--teal-dark);">實驗結果</h3>
+    <div class="stat-row" id="statRow"></div>
+
+    <div id="chartHost"></div>
+
+    <table id="resultsTable">
+      <thead>
+        <tr><th>#</th><th>A (px)</th><th>W (px)</th><th>ID (bits)</th><th>MT (ms)</th><th>命中</th></tr>
+      </thead>
+      <tbody id="resultsBody"></tbody>
+    </table>
+
+    <div class="action-row">
+      <button class="btn-primary" id="downloadBtn">下載 CSV</button>
+      <button class="btn-secondary" id="restartBtn">重新開始實驗</button>
+    </div>
+  </section>
+
+  <footer>Fitts' Law Custom Experiment · 為 HCI 課程作業產生</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ---------- DOM ----------
+  const introPanel = document.getElementById('intro-panel');
+  const stagePanel = document.getElementById('stage-panel');
+  const resultsPanel = document.getElementById('results-panel');
+  const startBtn = document.getElementById('startBtn');
+  const restartBtn = document.getElementById('restartBtn');
+  const downloadBtn = document.getElementById('downloadBtn');
+  const canvas = document.getElementById('stage');
+  const canvasHost = document.getElementById('canvasHost');
+  const flashLayer = document.getElementById('flashLayer');
+  const ctx = canvas.getContext('2d');
+
+  const hudTrial = document.getElementById('hudTrial');
+  const hudA = document.getElementById('hudA');
+  const hudW = document.getElementById('hudW');
+  const hudID = document.getElementById('hudID');
+  const hudLast = document.getElementById('hudLast');
+
+  // ---------- State ----------
+  let trials = [];           // planned {A, W, ID}
+  let results = [];          // completed trial records
+  let trialIndex = 0;
+  let currentTarget = null;  // {x,y,w}
+  let lastClickPoint = null; // {x,y} start point for next distance calc
+  let trialStartTime = 0;
+  let distractors = [];
+  let dpr = 1;
+
+  function resizeCanvas(){
+    const rect = canvasHost.getBoundingClientRect();
+    dpr = window.devicePixelRatio || 1;
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+  }
+  window.addEventListener('resize', () => { resizeCanvas(); draw(); });
+
+  function parseNumberList(str){
+    return str.split(',').map(s => parseFloat(s.trim())).filter(n => !isNaN(n) && n > 0);
+  }
+
+  function buildTrialList(){
+    const AList = parseNumberList(document.getElementById('cfgA').value);
+    const WList = parseNumberList(document.getElementById('cfgW').value);
+    const reps = Math.max(1, parseInt(document.getElementById('cfgReps').value) || 1);
+    const list = [];
+    AList.forEach(A => {
+      WList.forEach(W => {
+        const ID = Math.log2(A / W + 1);
+        for (let r = 0; r < reps; r++){
+          list.push({A, W, ID});
+        }
       });
-      for (let i = trials.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [trials[i], trials[j]] = [trials[j], trials[i]];
+    });
+    // shuffle (Fisher-Yates) to counter order/learning effects
+    for (let i = list.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i+1));
+      [list[i], list[j]] = [list[j], list[i]];
+    }
+    return list;
+  }
+
+  function buildDistractors(n){
+    const rect = canvasHost.getBoundingClientRect();
+    const arr = [];
+    for (let i = 0; i < n; i++){
+      arr.push({
+        x: 30 + Math.random() * (rect.width - 60),
+        y: 30 + Math.random() * (rect.height - 60),
+        r: 14 + Math.random() * 6
+      });
+    }
+    return arr;
+  }
+
+  // Place next target at distance A from lastClickPoint, at a random angle,
+  // clamped to remain fully inside the canvas.
+  function placeNextTarget(A, W){
+    const rect = canvasHost.getBoundingClientRect();
+    const margin = W/2 + 6;
+    const cx = lastClickPoint ? lastClickPoint.x : rect.width/2;
+    const cy = lastClickPoint ? lastClickPoint.y : rect.height/2;
+
+    for (let attempt = 0; attempt < 60; attempt++){
+      const angle = Math.random() * Math.PI * 2;
+      const x = cx + Math.cos(angle) * A;
+      const y = cy + Math.sin(angle) * A;
+      if (x >= margin && x <= rect.width - margin && y >= margin && y <= rect.height - margin){
+        return {x, y, w: W};
       }
     }
+    // fallback: clamp into bounds directly
+    const angle = Math.random() * Math.PI * 2;
+    let x = cx + Math.cos(angle) * A;
+    let y = cy + Math.sin(angle) * A;
+    x = Math.min(Math.max(x, margin), rect.width - margin);
+    y = Math.min(Math.max(y, margin), rect.height - margin);
+    return {x, y, w: W};
+  }
 
-    function startExperiment() {
-      buildTrials();
-      dataset = [];
-      currentIndex = 0;
-      document.getElementById("dashboard").style.display = "none";
-      prepareTrial();
+  function draw(){
+    const rect = canvasHost.getBoundingClientRect();
+    ctx.clearRect(0,0,rect.width, rect.height);
+
+    // background "home screen" grid feel
+    ctx.fillStyle = '#EFEDE4';
+    ctx.fillRect(0,0,rect.width, rect.height);
+
+    // distractor icons (other apps)
+    distractors.forEach(d => {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, Math.PI*2);
+      ctx.fillStyle = '#C9C6BA';
+      ctx.fill();
+    });
+
+    // start point marker
+    if (lastClickPoint){
+      ctx.beginPath();
+      ctx.arc(lastClickPoint.x, lastClickPoint.y, 4, 0, Math.PI*2);
+      ctx.fillStyle = '#9AA6AC';
+      ctx.fill();
     }
 
-    function prepareTrial() {
-      if (currentIndex >= trials.length) {
-        completeExperiment();
-        return;
-      }
+    // target
+    if (currentTarget){
+      const {x,y,w} = currentTarget;
+      ctx.beginPath();
+      ctx.arc(x, y, w/2, 0, Math.PI*2);
+      ctx.fillStyle = '#1E8E76';
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#0B5148';
+      ctx.stroke();
 
-      const trial = trials[currentIndex];
-      const winW = window.innerWidth;
-      const target = document.getElementById("target-btn");
-      const start = document.getElementById("start-circle");
+      ctx.fillStyle = '#fff';
+      ctx.font = `${Math.max(11, Math.min(16, w*0.28))}px -apple-system, "Microsoft JhengHei", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('已服藥', x, y);
+    }
+  }
 
-      const centerX = winW / 2;
-      const startY = 100;
-      const targetY = startY + trial.D;
+  function startTrial(){
+    if (trialIndex >= trials.length){
+      finishExperiment();
+      return;
+    }
+    const spec = trials[trialIndex];
+    currentTarget = placeNextTarget(spec.A, spec.W);
+    hudTrial.textContent = `${trialIndex+1} / ${trials.length}`;
+    hudA.textContent = spec.A;
+    hudW.textContent = spec.W;
+    hudID.textContent = spec.ID.toFixed(2);
+    draw();
+    trialStartTime = performance.now();
+  }
 
-      start.style.left = `${centerX}px`;
-      start.style.top = `${startY}px`;
-      start.style.display = "flex";
+  function flashMiss(){
+    flashLayer.classList.add('show');
+    setTimeout(() => flashLayer.classList.remove('show'), 120);
+  }
 
-      target.className = trial.type === "Safeguard_UI" ? "safeguard-target" : "normal-target";
-      target.innerText = trial.type === "Safeguard_UI" ? "DELETE" : "SAVE";
-      target.style.width = `${trial.W}px`;
-      target.style.height = `${trial.W}px`;
-      target.style.left = `${centerX}px`;
-      target.style.top = `${targetY}px`;
-      target.style.display = "none";
+  function handleClick(evt){
+    if (!currentTarget) return;
+    const rect = canvas.getBoundingClientRect();
+    const clickX = (evt.clientX !== undefined ? evt.clientX : evt.touches[0].clientX) - rect.left;
+    const clickY = (evt.clientY !== undefined ? evt.clientY : evt.touches[0].clientY) - rect.top;
+
+    const mt = performance.now() - trialStartTime;
+    const dx = clickX - currentTarget.x;
+    const dy = clickY - currentTarget.y;
+    const dist = Math.sqrt(dx*dx + dy*dy);
+    const hit = dist <= currentTarget.w/2;
+
+    const spec = trials[trialIndex];
+    results.push({
+      trial: trialIndex+1,
+      A: spec.A,
+      W: spec.W,
+      ID: spec.ID,
+      MT: Math.round(mt),
+      hit: hit,
+      clickX: Math.round(clickX),
+      clickY: Math.round(clickY),
+      targetX: Math.round(currentTarget.x),
+      targetY: Math.round(currentTarget.y)
+    });
+
+    hudLast.textContent = hit ? `命中，MT = ${Math.round(mt)} ms` : `未命中（仍記錄），MT = ${Math.round(mt)} ms`;
+    if (!hit) flashMiss();
+
+    lastClickPoint = {x: clickX, y: clickY};
+    trialIndex++;
+    startTrial();
+  }
+
+  canvas.addEventListener('click', handleClick);
+  canvas.addEventListener('touchstart', (e) => { e.preventDefault(); handleClick(e); }, {passive:false});
+
+  function finishExperiment(){
+    stagePanel.classList.remove('active');
+    resultsPanel.classList.add('active');
+    renderResults();
+  }
+
+  // ---------- Results / stats / regression ----------
+  function linearRegression(points){
+    // points: [{x, y}], returns {a, b, r2}  for y = a + b*x
+    const n = points.length;
+    const sumX = points.reduce((s,p)=>s+p.x,0);
+    const sumY = points.reduce((s,p)=>s+p.y,0);
+    const meanX = sumX/n, meanY = sumY/n;
+    let num = 0, den = 0;
+    points.forEach(p => { num += (p.x-meanX)*(p.y-meanY); den += (p.x-meanX)*(p.x-meanX); });
+    const b = den === 0 ? 0 : num/den;
+    const a = meanY - b*meanX;
+    let ssTot = 0, ssRes = 0;
+    points.forEach(p => {
+      const pred = a + b*p.x;
+      ssRes += (p.y-pred)*(p.y-pred);
+      ssTot += (p.y-meanY)*(p.y-meanY);
+    });
+    const r2 = ssTot === 0 ? 1 : 1 - ssRes/ssTot;
+    return {a,b,r2};
+  }
+
+  function renderResults(){
+    const tbody = document.getElementById('resultsBody');
+    tbody.innerHTML = '';
+    results.forEach(r => {
+      const tr = document.createElement('tr');
+      if (!r.hit) tr.classList.add('miss');
+      tr.innerHTML = `<td>${r.trial}</td><td>${r.A}</td><td>${r.W}</td><td>${r.ID.toFixed(2)}</td><td>${r.MT}</td><td>${r.hit ? '✓' : '✗'}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    const hitResults = results.filter(r => r.hit);
+    const errorRate = 100 * (results.length - hitResults.length) / results.length;
+    const avgMT = results.reduce((s,r)=>s+r.MT,0) / results.length;
+
+    let regText = '資料不足以計算';
+    let reg = null;
+    if (hitResults.length >= 2){
+      reg = linearRegression(hitResults.map(r => ({x:r.ID, y:r.MT})));
+      regText = `MT = ${reg.a.toFixed(1)} + ${reg.b.toFixed(1)} × ID`;
     }
 
-    function handleStartClick() {
-      document.getElementById("start-circle").style.display = "none";
-      document.getElementById("target-btn").style.display = "flex";
-      startTime = performance.now();
+    document.getElementById('statRow').innerHTML = `
+      <div class="stat"><div class="n">${results.length}</div><div class="l">總回合數</div></div>
+      <div class="stat"><div class="n">${errorRate.toFixed(1)}%</div><div class="l">誤觸率</div></div>
+      <div class="stat"><div class="n">${avgMT.toFixed(0)} ms</div><div class="l">平均移動時間</div></div>
+      <div class="stat"><div class="n" style="font-size:16px;">${regText}</div><div class="l">Fitts' Law 迴歸公式（僅命中回合）${reg ? `<span class="badge">R² = ${reg.r2.toFixed(3)}</span>` : ''}</div></div>
+    `;
+
+    drawScatter(hitResults, reg);
+  }
+
+  function drawScatter(points, reg){
+    const host = document.getElementById('chartHost');
+    host.innerHTML = '';
+    const w = host.clientWidth || 600;
+    const h = 340;
+    const pad = {l:56, r:20, t:20, b:46};
+
+    const svgNS = "http://www.w3.org/2000/svg";
+    const svg = document.createElementNS(svgNS, "svg");
+    svg.setAttribute("width", "100%");
+    svg.setAttribute("height", h);
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    svg.style.background = "#FBFAF7";
+    svg.style.border = "1px solid var(--line)";
+    svg.style.borderRadius = "10px";
+
+    if (points.length === 0){
+      host.appendChild(svg);
+      return;
     }
 
-    function handleTargetClick() {
-      const movementTime = performance.now() - startTime;
-      const trial = trials[currentIndex];
-      const id = Math.log2(trial.D / trial.W + 1);
+    const maxID = Math.max(...points.map(p=>p.ID)) * 1.1;
+    const maxMT = Math.max(...points.map(p=>p.MT)) * 1.15;
 
-      dataset.push({
-        Trial: currentIndex + 1,
-        Type: trial.type,
-        Distance_px: trial.D,
-        Width_px: trial.W,
-        ID_bits: parseFloat(id.toFixed(3)),
-        MovementTime_ms: parseFloat(movementTime.toFixed(2))
-      });
+    const xScale = id => pad.l + (id/maxID) * (w - pad.l - pad.r);
+    const yScale = mt => h - pad.b - (mt/maxMT) * (h - pad.t - pad.b);
 
-      document.getElementById("target-btn").style.display = "none";
-      currentIndex++;
-      setTimeout(prepareTrial, 120);
+    // axes
+    const axis = document.createElementNS(svgNS,"path");
+    axis.setAttribute("d", `M${pad.l},${pad.t} V${h-pad.b} H${w-pad.r}`);
+    axis.setAttribute("stroke", "#9AA6AC");
+    axis.setAttribute("fill", "none");
+    svg.appendChild(axis);
+
+    // axis labels
+    for (let i=0;i<=4;i++){
+      const idVal = (maxID/4)*i;
+      const x = xScale(idVal);
+      const tick = document.createElementNS(svgNS,"text");
+      tick.setAttribute("x", x); tick.setAttribute("y", h-pad.b+18);
+      tick.setAttribute("font-size","11"); tick.setAttribute("fill","#5B6B74");
+      tick.setAttribute("text-anchor","middle");
+      tick.textContent = idVal.toFixed(1);
+      svg.appendChild(tick);
+
+      const mtVal = (maxMT/4)*i;
+      const y = yScale(mtVal);
+      const tickY = document.createElementNS(svgNS,"text");
+      tickY.setAttribute("x", pad.l-8); tickY.setAttribute("y", y+4);
+      tickY.setAttribute("font-size","11"); tickY.setAttribute("fill","#5B6B74");
+      tickY.setAttribute("text-anchor","end");
+      tickY.textContent = mtVal.toFixed(0);
+      svg.appendChild(tickY);
     }
 
-    function completeExperiment() {
-      const db = document.getElementById("dashboard");
-      db.style.display = "block";
-      document.getElementById("condition-text").innerText = "Completed";
-      document.getElementById("progress-text").innerText = `${dataset.length} / ${dataset.length}`;
-      document.getElementById("start-btn").style.display = "none";
-      document.getElementById("export-btn").style.display = "block";
+    const xLabel = document.createElementNS(svgNS,"text");
+    xLabel.setAttribute("x", (pad.l + w - pad.r)/2); xLabel.setAttribute("y", h-6);
+    xLabel.setAttribute("font-size","12.5"); xLabel.setAttribute("fill","#22303A");
+    xLabel.setAttribute("text-anchor","middle");
+    xLabel.textContent = "Index of Difficulty, ID (bits)";
+    svg.appendChild(xLabel);
+
+    const yLabel = document.createElementNS(svgNS,"text");
+    yLabel.setAttribute("x", -h/2); yLabel.setAttribute("y", 16);
+    yLabel.setAttribute("font-size","12.5"); yLabel.setAttribute("fill","#22303A");
+    yLabel.setAttribute("text-anchor","middle");
+    yLabel.setAttribute("transform","rotate(-90)");
+    yLabel.textContent = "Movement Time, MT (ms)";
+    svg.appendChild(yLabel);
+
+    // regression line
+    if (reg){
+      const x1 = 0, x2 = maxID;
+      const y1 = reg.a + reg.b*x1;
+      const y2 = reg.a + reg.b*x2;
+      const line = document.createElementNS(svgNS,"line");
+      line.setAttribute("x1", xScale(x1)); line.setAttribute("y1", yScale(Math.max(0,y1)));
+      line.setAttribute("x2", xScale(x2)); line.setAttribute("y2", yScale(y2));
+      line.setAttribute("stroke", "#B9840F");
+      line.setAttribute("stroke-width", "2");
+      line.setAttribute("stroke-dasharray", "6 4");
+      svg.appendChild(line);
     }
 
-    function exportCSV() {
-      const header = ["Trial", "Type", "Distance_px", "Width_px", "ID_bits", "MovementTime_ms"];
-      const rows = dataset.map(d => [d.Trial, d.Type, d.Distance_px, d.Width_px, d.ID_bits, d.MovementTime_ms].join(","));
-      const csv = "data:text/csv;charset=utf-8," + [header.join(","), ...rows].join("\n");
-      const a = document.createElement("a");
-      a.href = encodeURI(csv);
-      a.download = "anti_accidental_click_fitts_data.csv";
-      a.click();
-    }
-  </script>
+    // points
+    points.forEach(p => {
+      const c = document.createElementNS(svgNS,"circle");
+      c.setAttribute("cx", xScale(p.ID));
+      c.setAttribute("cy", yScale(p.MT));
+      c.setAttribute("r", 4.5);
+      c.setAttribute("fill", "#0F6E63");
+      c.setAttribute("fill-opacity", "0.75");
+      svg.appendChild(c);
+    });
+
+    host.appendChild(svg);
+  }
+
+  function toCSV(){
+    const header = ['trial','A_px','W_px','ID_bits','MT_ms','hit','click_x','click_y','target_x','target_y'];
+    const rows = results.map(r => [r.trial, r.A, r.W, r.ID.toFixed(4), r.MT, r.hit ? 1 : 0, r.clickX, r.clickY, r.targetX, r.targetY].join(','));
+    return [header.join(','), ...rows].join('\n');
+  }
+
+  downloadBtn.addEventListener('click', () => {
+    const csv = toCSV();
+    const blob = new Blob([csv], {type: 'text/csv;charset=utf-8;'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `fitts_law_results_${Date.now()}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  function resetAndStart(){
+    results = [];
+    trialIndex = 0;
+    lastClickPoint = null;
+    trials = buildTrialList();
+    resizeCanvas();
+    distractors = buildDistractors(parseInt(document.getElementById('cfgDistract').value) || 0);
+
+    introPanel.style.display = 'none';
+    resultsPanel.classList.remove('active');
+    stagePanel.classList.add('active');
+
+    startTrial();
+  }
+
+  startBtn.addEventListener('click', resetAndStart);
+  restartBtn.addEventListener('click', () => {
+    resultsPanel.classList.remove('active');
+    introPanel.style.display = 'block';
+  });
+
+  resizeCanvas();
+})();
+</script>
 </body>
 </html>
