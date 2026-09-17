@@ -52,8 +52,3 @@ $$MT = 57.64 + 139.21 \cdot \log_2\left(\frac{2A}{W}\right)$$
 * **Intercept ($a$):** $57.64\text{ ms}$ (baseline sensory-motor initiation delay)
 * **Slope ($b$):** $139.21\text{ ms/bit}$ (information processing rate)
 * **Coefficient of Determination ($R^2$):** $0.8483$ (demonstrating a robust fit to Fitts' Law)
-
-### Empirical Discussion
-The empirical findings strongly validate the asymmetric layout:
-1. **Low $ID$ for Core Combat:** The large, centrally positioned `ATTACK` button yielded rapid movement times ($269.6\text{ ms} - 422.6\text{ ms}$), enabling split-second reflex engagement.
-2. **High $ID$ for Protective Friction:** The miniaturized, peripheral `CONFIG` button exhibited elevated movement times ($490.1\text{ ms} - 653.8\text{ ms}$), creating a physical protective threshold against accidental triggering during intense combat scenarios.
