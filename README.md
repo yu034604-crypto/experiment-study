@@ -20,7 +20,7 @@ Under high stress and rapid tapping, players frequently suffer from motor slips 
 * **Distance Stratification:** 
   * Target distances from the resting position vary systematically across $A = 140\text{ px}, 210\text{ px}, 280\text{ px}$.
   * `ATTACK` targets remain within the central action zone, whereas `CFG` targets are pushed toward peripheral edges and corners.
-* **Fitts' Law Mechanism:** By intentionally elevating the Index of Difficulty ($ID = \log_2(2A/W)$) for `CFG` through reduced width and peripheral placement, the layout creates physical motor friction that naturally prevents accidental triggers.
+* **Fitts' Law Mechanism:** By intentionally elevating the Index of Difficulty for `CFG` through reduced width and peripheral placement, the layout creates physical motor friction that naturally prevents accidental triggers.
 
 ### Application & Real-World Extensions
 * **Current Experimental Tool:** A responsive web application featuring real-time millisecond stopwatch timing, live MT display, dynamic $A$ & $W$ parameters, 9 randomized conditions, and aggregated CSV data export.
