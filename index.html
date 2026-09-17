@@ -3,121 +3,66 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fitts' Law Experiment: Screen-Edge vs. Floating Targets</title>
+  <title>Anti-Accidental Activation Fitts' Law Study</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      user-select: none;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
     body {
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-      background-color: #121214;
-      color: #f0f0f4;
+      width: 100vw; height: 100vh; overflow: hidden;
+      background-color: #0f172a; color: #f8fafc;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       position: relative;
     }
     #dashboard {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      padding: 28px 36px;
-      background: rgba(26, 26, 30, 0.95);
-      border: 1px solid #33333a;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-      text-align: center;
-      z-index: 1000;
-      width: 420px;
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+      padding: 32px 36px; background: rgba(30, 41, 59, 0.95);
+      border: 1px solid #475569; border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.6); text-align: center;
+      z-index: 1000; width: 460px;
     }
-    #dashboard h2 {
-      font-size: 20px;
-      margin-bottom: 12px;
-      color: #60a5fa;
-      font-weight: 600;
-    }
-    #dashboard p {
-      font-size: 13px;
-      line-height: 1.6;
-      color: #9ca3af;
-      margin-bottom: 16px;
-    }
-    .status-row {
-      display: flex;
-      justify-content: space-between;
-      margin: 6px 0;
-      font-size: 13px;
-      color: #e5e7eb;
-    }
+    #dashboard h2 { font-size: 20px; margin-bottom: 12px; color: #38bdf8; font-weight: 600; }
+    #dashboard p { font-size: 13px; line-height: 1.6; color: #94a3b8; margin-bottom: 18px; }
+    .status-row { display: flex; justify-content: space-between; margin: 8px 0; font-size: 13px; color: #cbd5e1; }
     button.btn {
-      margin-top: 14px;
-      width: 100%;
-      padding: 10px 16px;
-      border: none;
-      border-radius: 8px;
-      background: #2563eb;
-      color: white;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
+      margin-top: 18px; width: 100%; padding: 11px 16px; border: none;
+      border-radius: 8px; background: #2563eb; color: white;
+      font-size: 14px; font-weight: 600; cursor: pointer; transition: background 0.2s;
     }
-    button.btn:hover {
-      background: #1d4ed8;
-    }
+    button.btn:hover { background: #1d4ed8; }
     #start-circle {
-      position: absolute;
-      width: 42px;
-      height: 42px;
-      border-radius: 50%;
-      background: #10b981;
-      transform: translate(-50%, -50%);
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
-      font-weight: bold;
-      color: white;
+      position: absolute; width: 44px; height: 44px; border-radius: 50%;
+      background: #10b981; transform: translate(-50%, -50%);
+      cursor: pointer; display: none; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: bold; color: white; z-index: 200;
       box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
-      z-index: 200;
     }
-    #target-bar {
-      position: absolute;
-      background: #ef4444;
-      cursor: pointer;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: bold;
-      color: white;
-      box-shadow: 0 0 14px rgba(239, 68, 68, 0.35);
-      z-index: 200;
+    #target-btn {
+      position: absolute; border-radius: 6px; cursor: pointer;
+      display: none; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: bold; color: white; z-index: 200;
+      box-shadow: 0 0 14px rgba(0, 0, 0, 0.3);
     }
+    .normal-target { background: #3b82f6; border: 1px solid #60a5fa; }
+    .safeguard-target { background: #ef4444; border: 1px solid #f87171; }
   </style>
 </head>
 <body>
   <div id="dashboard">
-    <h2>Screen-Edge Fitts' Law Study</h2>
-    <p>Press <strong>F11</strong> for Fullscreen mode before starting. Click the green <strong>START</strong> anchor, then move downwards to acquire the red <strong>TARGET</strong> bar as quickly and accurately as possible.</p>
+    <h2>Anti-Accidental Activation Study</h2>
+    <p>Press <strong>F11</strong> for Fullscreen mode. Click the green <strong>START</strong> anchor, then acquire the <strong>TARGET</strong> button as quickly and accurately as possible.</p>
     <div class="status-row"><span>Status:</span><strong id="condition-text">Ready</strong></div>
-    <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 54</strong></div>
+    <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 36</strong></div>
     <button id="start-btn" class="btn" onclick="startExperiment()">Start Experiment</button>
     <button id="export-btn" class="btn" style="display:none; background:#059669;" onclick="exportCSV()">Download Dataset (CSV)</button>
   </div>
 
   <div id="start-circle" onclick="handleStartClick()">START</div>
-  <div id="target-bar" onclick="handleTargetClick()">TARGET</div>
+  <div id="target-btn" onclick="handleTargetClick()">CONFIRM</div>
 
   <script>
-    const distances = [250, 420, 600]; // 垂直距離 (px)
-    const widths = [24, 48, 80];        // 目標條厚度 (px)
-    const conditions = ["Edge", "Floating"];
+    const conditions = [
+      { type: "Standard_UI", D: [200, 350, 500], W: [60, 90] },
+      { type: "Safeguard_UI", D: [400, 600, 750], W: [18, 30] }
+    ];
     const repeats = 3;
 
     let trials = [];
@@ -125,18 +70,17 @@
     let startTime = 0;
     let dataset = [];
 
-    function initQueue() {
+    function buildTrials() {
       trials = [];
-      conditions.forEach(cond => {
-        distances.forEach(d => {
-          widths.forEach(w => {
+      conditions.forEach(c => {
+        c.D.forEach(d => {
+          c.W.forEach(w => {
             for (let r = 0; r < repeats; r++) {
-              trials.push({ condition: cond, D: d, W: w });
+              trials.push({ type: c.type, D: d, W: w });
             }
           });
         });
       });
-      // 隨機排列 (Shuffle)
       for (let i = trials.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [trials[i], trials[j]] = [trials[j], trials[i]];
@@ -144,7 +88,7 @@
     }
 
     function startExperiment() {
-      initQueue();
+      buildTrials();
       dataset = [];
       currentIndex = 0;
       document.getElementById("dashboard").style.display = "none";
@@ -160,59 +104,51 @@
       const trial = trials[currentIndex];
       const winW = window.innerWidth;
       const winH = window.innerHeight;
-      const targetBar = document.getElementById("target-bar");
-      const startCircle = document.getElementById("start-circle");
+      const target = document.getElementById("target-btn");
+      const start = document.getElementById("start-circle");
 
-      const barWidth = 360;
-      const targetX = (winW - barWidth) / 2;
+      const angle = (Math.random() * Math.PI * 0.6) + 0.2 * Math.PI;
+      const centerX = winW / 2;
+      const startY = winH - 120;
+      const startX = centerX;
 
-      // 目標移到螢幕底端：
-      // Edge: 貼死視窗最底 (winH - trial.W)
-      // Floating: 離底端懸空 80px (winH - trial.W - 80)
-      const targetY = trial.condition === "Edge" 
-        ? (winH - trial.W) 
-        : (winH - trial.W - 80);
+      const targetX = startX + Math.cos(angle) * trial.D * (Math.random() > 0.5 ? 1 : -1);
+      const targetY = startY - Math.sin(angle) * trial.D;
 
-      targetBar.style.left = `${targetX}px`;
-      targetBar.style.top = `${targetY}px`;
-      targetBar.style.width = `${barWidth}px`;
-      targetBar.style.height = `${trial.W}px`;
-      targetBar.style.display = "none";
+      start.style.left = `${startX}px`;
+      start.style.top = `${startY}px`;
+      start.style.display = "flex";
 
-      // 起點在上方，由上往下移動距離 D
-      const targetCenterY = targetY + trial.W / 2;
-      const startX = winW / 2;
-      const startY = targetCenterY - trial.D;
-
-      startCircle.style.left = `${startX}px`;
-      startCircle.style.top = `${startY}px`;
-      startCircle.style.display = "flex";
+      target.className = trial.type === "Safeguard_UI" ? "safeguard-target" : "normal-target";
+      target.innerText = trial.type === "Safeguard_UI" ? "DELETE" : "SAVE";
+      target.style.width = `${trial.W}px`;
+      target.style.height = `${trial.W}px`;
+      target.style.left = `${targetX}px`;
+      target.style.top = `${targetY}px`;
+      target.style.display = "none";
     }
 
     function handleStartClick() {
       document.getElementById("start-circle").style.display = "none";
-      document.getElementById("target-bar").style.display = "flex";
+      document.getElementById("target-btn").style.display = "flex";
       startTime = performance.now();
     }
 
     function handleTargetClick() {
-      const endTime = performance.now();
-      const movementTime = endTime - startTime;
+      const movementTime = performance.now() - startTime;
       const trial = trials[currentIndex];
-
-      // Shannon formulation: ID = log2(D / W + 1)
       const id = Math.log2(trial.D / trial.W + 1);
 
       dataset.push({
         Trial: currentIndex + 1,
-        Condition: trial.condition,
+        Type: trial.type,
         Distance_px: trial.D,
         Width_px: trial.W,
-        ID_bits: id.toFixed(3),
-        MovementTime_ms: movementTime.toFixed(2)
+        ID_bits: parseFloat(id.toFixed(3)),
+        MovementTime_ms: parseFloat(movementTime.toFixed(2))
       });
 
-      document.getElementById("target-bar").style.display = "none";
+      document.getElementById("target-btn").style.display = "none";
       currentIndex++;
       setTimeout(prepareTrial, 120);
     }
@@ -227,18 +163,13 @@
     }
 
     function exportCSV() {
-      if (!dataset.length) return;
-      const header = ["Trial", "Condition", "Distance_px", "Width_px", "ID_bits", "MovementTime_ms"];
-      const rows = dataset.map(d => 
-        [d.Trial, d.Condition, d.Distance_px, d.Width_px, d.ID_bits, d.MovementTime_ms].join(",")
-      );
-      const csvString = "data:text/csv;charset=utf-8," + [header.join(","), ...rows].join("\n");
-      const link = document.createElement("a");
-      link.href = encodeURI(csvString);
-      link.download = "fitts_edge_experiment_data.csv";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+      const header = ["Trial", "Type", "Distance_px", "Width_px", "ID_bits", "MovementTime_ms"];
+      const rows = dataset.map(d => [d.Trial, d.Type, d.Distance_px, d.Width_px, d.ID_bits, d.MovementTime_ms].join(","));
+      const csv = "data:text/csv;charset=utf-8," + [header.join(","), ...rows].join("\n");
+      const a = document.createElement("a");
+      a.href = encodeURI(csv);
+      a.download = "anti_accidental_click_fitts_data.csv";
+      a.click();
     }
   </script>
 </body>
