@@ -9,7 +9,6 @@
       --panel: #111827;
       --border: #1f2937;
       --attack: #ea580c;
-      --attack-glow: #f97316;
       --config: #374151;
       --text: #f3f4f6;
       --muted: #9ca3af;
@@ -32,32 +31,48 @@
       user-select: none;
     }
 
-    /* Top Professional HUD Metrics Bar */
-    #top-bar {
+    /* 獨立高顯眼 HUD 儀表板 */
+    #hud-dashboard {
       width: 900px;
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      padding: 10px 18px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 13px;
-      color: var(--muted);
-      margin-bottom: 10px;
-      background: #111827;
-      padding: 8px 16px;
-      border-radius: 6px;
-      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
-    .metric-group {
+    .hud-block {
       display: flex;
-      gap: 16px;
+      flex-direction: column;
       align-items: center;
     }
-    .metric-group span {
-      color: #fff;
-      font-weight: 600;
+    .hud-label {
+      font-size: 11px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
     }
-    .timer-val {
+    .hud-value {
+      font-size: 15px;
+      font-weight: 700;
+      color: #ffffff;
+    }
+    /* 計時器高亮 */
+    .hud-value.timer {
+      color: #38bdf8;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      color: var(--accent) !important;
+      font-size: 18px;
+      min-width: 85px;
+      text-align: center;
+    }
+    .hud-value.last-mt {
+      color: #4ade80;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 16px;
     }
 
     /* Main Interaction Canvas */
@@ -118,12 +133,11 @@
     .target-sublabel {
       font-size: 9px;
       font-weight: 400;
-      opacity: 0.8;
+      opacity: 0.85;
       line-height: 1;
       margin-top: 2px;
     }
 
-    /* Prominent Attack Button */
     .target-attack {
       background: linear-gradient(135deg, #ea580c, #c2410c);
       color: #ffffff;
@@ -132,7 +146,6 @@
       letter-spacing: 1px;
     }
 
-    /* Compact Config Button */
     .target-config {
       background: var(--config);
       color: #cbd5e1;
@@ -183,18 +196,35 @@
 </head>
 <body>
 
-  <!-- Comprehensive Real-Time Metrics Header -->
-  <div id="top-bar">
-    <div class="metric-group">
-      <div>Condition: <span id="lbl-cond">Idle</span></div>
-      <div>Distance (A): <span id="lbl-dist">--</span></div>
-      <div>Width (W): <span id="lbl-width">--</span></div>
+  <!-- 顯眼獨立 HUD 資訊面板 (計時器、上次 MT、距離、寬度全部獨立顯示) -->
+  <div id="hud-dashboard">
+    <div class="hud-block">
+      <div class="hud-label">Condition</div>
+      <div id="lbl-cond" class="hud-value">Idle</div>
     </div>
-    <div class="metric-group">
-      <div>Timer: <span id="lbl-timer" class="timer-val">0 ms</span></div>
-      <div>Last MT: <span id="lbl-last-mt">--</span></div>
-      <div>Trials: <span id="lbl-trials">0/10</span></div>
-      <div>Misses: <span id="lbl-miss" style="color:var(--danger)">0</span></div>
+    <div class="hud-block">
+      <div class="hud-label">Distance (A)</div>
+      <div id="lbl-dist" class="hud-value">--</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Target Width (W)</div>
+      <div id="lbl-width" class="hud-value">--</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Live Movement Timer</div>
+      <div id="lbl-timer" class="hud-value timer">0.000 s</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Last Recorded MT</div>
+      <div id="lbl-last-mt" class="hud-value last-mt">--</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Valid Trials</div>
+      <div id="lbl-trials" class="hud-value">0/10</div>
+    </div>
+    <div class="hud-block">
+      <div class="hud-label">Misses</div>
+      <div id="lbl-miss" class="hud-value" style="color:var(--danger)">0</div>
     </div>
   </div>
 
@@ -221,10 +251,9 @@
   </div>
 
   <script>
-    // Variables systematically varied: 3 Distances (A) x 3 Widths (W) = 9 Conditions
-    const distances = [140, 210, 280]; // Distance from rest origin in pixels
-    const widths = [28, 54, 96];        // Target Width in pixels
-    const TAPS_PER_COND = 11;          // 1st Warm-up discarded, 10 valid trials recorded
+    const distances = [140, 210, 280];
+    const widths = [28, 54, 96];
+    const TAPS_PER_COND = 11;
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
@@ -234,7 +263,7 @@
     let state = 'IDLE';
     let currentRole = 'ATTACK';
     let startTimestamp = 0;
-    let timerInterval = null;
+    let timerFrameId = null;
     let rawRecords = [];
     let misses = 0;
 
@@ -268,14 +297,13 @@
       lblWidth.textContent = `${c.W} px`;
       lblTrials.textContent = `0/10`;
 
-      // Large width mapped to ATTACK; Small/Med mapped to CONFIG
       currentRole = c.W >= 70 ? 'ATTACK' : 'CONFIG';
 
       const activeEl = currentRole === 'ATTACK' ? btnAttack : btnConfig;
       const inactiveEl = currentRole === 'ATTACK' ? btnConfig : btnAttack;
       const subLabel = currentRole === 'ATTACK' ? subAttack : subConfig;
 
-      subLabel.textContent = `${c.W}px`;
+      subLabel.textContent = `W:${c.W}px`;
 
       const centerX = 450;
       const centerY = 260;
@@ -294,7 +322,6 @@
         targetY = centerY + (cornerY * c.A * 0.7) - (c.W / 2);
       }
 
-      // Keep safely inside bounds
       targetX = Math.max(20, Math.min(900 - c.W - 20, targetX));
       targetY = Math.max(20, Math.min(520 - 45 - 20, targetY));
 
@@ -310,10 +337,18 @@
       setStep('REST');
     }
 
+    function updateLiveStopwatch() {
+      if (state === 'TARGET') {
+        const elapsed = (performance.now() - startTimestamp) / 1000;
+        lblTimer.textContent = `${elapsed.toFixed(3)} s`;
+        timerFrameId = requestAnimationFrame(updateLiveStopwatch);
+      }
+    }
+
     function setStep(next) {
       state = next;
       if (next === 'REST') {
-        clearInterval(timerInterval);
+        cancelAnimationFrame(timerFrameId);
         restStation.classList.add('active');
         btnAttack.style.pointerEvents = 'none';
         btnConfig.style.pointerEvents = 'none';
@@ -322,15 +357,11 @@
         restStation.classList.remove('active');
         btnAttack.style.pointerEvents = 'auto';
         btnConfig.style.pointerEvents = 'auto';
-        guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack-glow)' : '#cbd5e1'}">[${currentRole}]</strong> (A: ${conditions[condIndex].A}px, W: ${conditions[condIndex].W}px)`;
+        guidance.innerHTML = `Target Active: Hit <strong style="color:${currentRole === 'ATTACK' ? '#ea580c' : '#94a3b8'}">[${currentRole}]</strong>`;
         
         startTimestamp = performance.now();
-        // High-frequency live stopwatch counter
-        clearInterval(timerInterval);
-        timerInterval = setInterval(() => {
-          const elapsed = Math.round(performance.now() - startTimestamp);
-          lblTimer.textContent = `${elapsed} ms`;
-        }, 16);
+        cancelAnimationFrame(timerFrameId);
+        timerFrameId = requestAnimationFrame(updateLiveStopwatch);
       }
     }
 
@@ -342,16 +373,16 @@
     function handleTargetClick(role) {
       if (state !== 'TARGET') return;
 
-      clearInterval(timerInterval);
+      cancelAnimationFrame(timerFrameId);
       const now = performance.now();
       const c = conditions[condIndex];
       const mt = Math.round(now - startTimestamp);
-      
-      // Update real-time MT readouts
-      lblTimer.textContent = `${mt} ms`;
+
+      // 即時凍結與更新上次 MT
+      lblTimer.textContent = `${(mt / 1000).toFixed(3)} s`;
       lblLastMt.textContent = `${mt} ms`;
 
-      // Drop first warm-up trial
+      // 剔除第 1 次 Warm-up
       if (clickCount > 0) {
         const id = Math.log2((2 * c.A) / c.W);
         rawRecords.push({
@@ -382,7 +413,6 @@
     btnAttack.addEventListener('mousedown', () => handleTargetClick('ATTACK'));
     btnConfig.addEventListener('mousedown', () => handleTargetClick('CONFIG'));
 
-    // Miss clicks on background
     canvas.addEventListener('mousedown', (e) => {
       if (state === 'TARGET' && e.target === canvas) {
         misses++;
@@ -401,19 +431,19 @@
       btnExport.disabled = true;
       lblMiss.textContent = '0';
       lblLastMt.textContent = '--';
-      lblTimer.textContent = '0 ms';
+      lblTimer.textContent = '0.000 s';
       setupCondition();
     }
 
     function finishStudy() {
-      clearInterval(timerInterval);
+      cancelAnimationFrame(timerFrameId);
       restStation.classList.remove('active');
       btnAttack.classList.add('hidden');
       btnConfig.classList.add('hidden');
-      lblCond.textContent = "Completed";
+      lblCond.textContent = "Finished";
       lblDist.textContent = "--";
       lblWidth.textContent = "--";
-      guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Export aggregated CSV below.</span>";
+      guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Please export your CSV below.</span>";
       btnExport.disabled = false;
     }
 
