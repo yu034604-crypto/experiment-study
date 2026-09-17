@@ -21,7 +21,7 @@
 
     body {
       margin: 0;
-      padding: 16px 20px 30px;
+      padding: 16px 20px 40px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -31,13 +31,13 @@
       user-select: none;
     }
 
-    /* HUD Dashboard Bar */
+    /* Top HUD Dashboard */
     #hud-dashboard {
       width: 900px;
       background: #1e293b;
       border: 1px solid #334155;
       border-radius: 8px;
-      padding: 10px 18px;
+      padding: 12px 20px;
       margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
@@ -64,8 +64,8 @@
     .hud-value.timer {
       color: #38bdf8;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 18px;
-      min-width: 85px;
+      font-size: 20px;
+      min-width: 90px;
       text-align: center;
     }
     .hud-value.last-mt {
@@ -78,7 +78,7 @@
     #canvas {
       position: relative;
       width: 900px;
-      height: 500px;
+      height: 480px;
       background: var(--panel);
       border: 1px solid var(--border);
       border-radius: 8px;
@@ -126,16 +126,8 @@
       cursor: pointer;
       transition: transform 0.05s ease;
     }
-    .hud-target:active {
-      transform: scale(0.95);
-    }
-    .target-sublabel {
-      font-size: 9px;
-      font-weight: 400;
-      opacity: 0.85;
-      line-height: 1;
-      margin-top: 2px;
-    }
+    .hud-target:active { transform: scale(0.95); }
+    .target-sublabel { font-size: 9px; font-weight: 400; opacity: 0.85; margin-top: 2px; }
 
     .target-attack {
       background: linear-gradient(135deg, #ea580c, #c2410c);
@@ -152,11 +144,9 @@
       box-shadow: 0 0 6px rgba(0,0,0,0.4);
     }
 
-    .hidden {
-      display: none !important;
-    }
+    .hidden { display: none !important; }
 
-    /* Bottom Control Bar */
+    /* Control Bar */
     #bottom-bar {
       width: 900px;
       margin-top: 12px;
@@ -164,10 +154,7 @@
       justify-content: space-between;
       align-items: center;
     }
-    #guidance {
-      font-size: 13px;
-      color: var(--muted);
-    }
+    #guidance { font-size: 13px; color: var(--muted); }
 
     .btn {
       border: none;
@@ -177,22 +164,11 @@
       border-radius: 6px;
       cursor: pointer;
     }
-    .btn-start {
-      background: var(--accent);
-      color: #090d16;
-    }
-    .btn-export {
-      background: var(--success);
-      color: #ffffff;
-      margin-left: 8px;
-    }
-    .btn:disabled {
-      background: #1f2937;
-      color: #4b5563;
-      cursor: not-allowed;
-    }
+    .btn-start { background: var(--accent); color: #090d16; }
+    .btn-export { background: var(--success); color: #ffffff; margin-left: 8px; }
+    .btn:disabled { background: #1f2937; color: #4b5563; cursor: not-allowed; }
 
-    /* Scenario & Innovation Documentation Card */
+    /* Scenario & Innovation Section */
     #research-panel {
       width: 900px;
       margin-top: 18px;
@@ -218,14 +194,12 @@
       color: #94a3b8;
       margin: 0;
     }
-    .research-card strong {
-      color: #e2e8f0;
-    }
+    .research-card strong { color: #e2e8f0; }
   </style>
 </head>
 <body>
 
-  <!-- Live Metrics Dashboard -->
+  <!-- 1. Real-Time HUD Dashboard -->
   <div id="hud-dashboard">
     <div class="hud-block">
       <div class="hud-label">Condition</div>
@@ -236,7 +210,7 @@
       <div id="lbl-dist" class="hud-value">--</div>
     </div>
     <div class="hud-block">
-      <div class="hud-label">Target Width (W)</div>
+      <div class="hud-label">Width (W)</div>
       <div id="lbl-width" class="hud-value">--</div>
     </div>
     <div class="hud-block">
@@ -244,7 +218,7 @@
       <div id="lbl-timer" class="hud-value timer">0.000 s</div>
     </div>
     <div class="hud-block">
-      <div class="hud-label">Last Recorded MT</div>
+      <div class="hud-label">Last MT</div>
       <div id="lbl-last-mt" class="hud-value last-mt">--</div>
     </div>
     <div class="hud-block">
@@ -257,7 +231,7 @@
     </div>
   </div>
 
-  <!-- Interactive Arena -->
+  <!-- 2. Interactive Arena -->
   <div id="canvas">
     <div id="rest-station">REST POSITION</div>
     <div id="btn-attack" class="hud-target target-attack hidden">
@@ -270,7 +244,7 @@
     </div>
   </div>
 
-  <!-- Action Bar -->
+  <!-- 3. Control Footer -->
   <div id="bottom-bar">
     <div id="guidance">Click <strong>Start Session</strong> to begin.</div>
     <div>
@@ -279,26 +253,28 @@
     </div>
   </div>
 
-  <!-- Academic Context: Scenario & Innovation -->
+  <!-- 4. Academic Context: Scenario & Innovation -->
   <div id="research-panel">
     <div class="research-card">
-      <h3>Scenario & Problem</h3>
+      <h3>Scenario & Real-World HCI Problem</h3>
       <p>
-        <strong>High-Arousal Mobile MOBA Combat (e.g., <em>Arena of Valor</em>):</strong> During intense, split-second team fights, players experience extreme excitement and panic tapping. Accidental slips onto adjacent non-combat buttons (e.g., settings, store, chat wheel) interrupt combat actions, leading to catastrophic team wipeouts and defeats.
+        <strong>High-Arousal Mobile MOBA Combat (e.g., <em>Arena of Valor / 傳說對決</em>):</strong> During intense, split-second team fights, players experience extreme adrenaline rush and panic tapping. Accidental slips onto adjacent non-combat utility buttons (e.g., settings, scoreboard, chat wheel) disrupt basic attack combos, leading to disastrous team wipeouts and defeats.
       </p>
     </div>
     <div class="research-card">
       <h3>Innovation & Fitts' Law Mechanism</h3>
       <p>
-        <strong>Asymmetric Target Sizing & Spatial Guard-Banding:</strong> Primary combat actions (<code>ATTACK</code>) are given large widths (W=96px) and placed closer to rest (A=140-210px) for rapid, error-tolerant execution. Utility buttons (<code>CFG</code>) are scaled down (W=28px) and pushed into corners to deliberately increase ID (Index of Difficulty), creating motor friction against accidental activation.
+        <strong>Asymmetric Target Sizing & Spatial Guard-Banding:</strong> The critical <code>ATTACK</code> button is given a large width (W=96px) for rapid, error-tolerant tapping. Non-combat utility buttons (<code>CFG</code>) are downsized (W=28px or 54px) across distances (A=140px to 280px) and pushed to peripheral corners to deliberately increase ID (Index of Difficulty), creating motor friction to prevent accidental triggers.
       </p>
     </div>
   </div>
 
   <script>
-    const distances = [140, 210, 280];
-    const widths = [28, 54, 96];
-    const TAPS_PER_COND = 11;
+    // Variables systematically varied: 3 Distances (A) x 3 Widths (W) = 9 Conditions
+    // CFG uses W = 28px, 54px; ATTACK uses W = 96px; Distance A ranges 140px - 280px
+    const distances = [140, 210, 280]; 
+    const widths = [28, 54, 96]; 
+    const TAPS_PER_COND = 11; // 1st Warm-up discarded, 10 valid trials recorded
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
@@ -342,7 +318,8 @@
       lblWidth.textContent = `${c.W} px`;
       lblTrials.textContent = `0/10`;
 
-      currentRole = c.W >= 70 ? 'ATTACK' : 'CONFIG';
+      // Assign role: W=28 or 54 -> CFG; W=96 -> ATTACK
+      currentRole = c.W <= 54 ? 'CFG' : 'ATTACK';
 
       const activeEl = currentRole === 'ATTACK' ? btnAttack : btnConfig;
       const inactiveEl = currentRole === 'ATTACK' ? btnConfig : btnAttack;
@@ -351,7 +328,7 @@
       subLabel.textContent = `W:${c.W}px`;
 
       const centerX = 450;
-      const centerY = 250;
+      const centerY = 240;
 
       let targetX = 0;
       let targetY = 0;
@@ -361,14 +338,15 @@
         targetX = centerX + (side * c.A) - (c.W / 2);
         targetY = centerY - 25;
       } else {
+        // CFG placed towards edge/corners across A=140-280px
         const cornerX = Math.random() > 0.5 ? 1 : -1;
         const cornerY = Math.random() > 0.5 ? -1 : 1;
-        targetX = centerX + (cornerX * c.A * 1.1) - (c.W / 2);
-        targetY = centerY + (cornerY * c.A * 0.7) - (c.W / 2);
+        targetX = centerX + (cornerX * c.A * 1.05) - (c.W / 2);
+        targetY = centerY + (cornerY * c.A * 0.65) - (c.W / 2);
       }
 
       targetX = Math.max(20, Math.min(900 - c.W - 20, targetX));
-      targetY = Math.max(20, Math.min(500 - 45 - 20, targetY));
+      targetY = Math.max(20, Math.min(480 - 45 - 20, targetY));
 
       activeEl.style.width = `${c.W}px`;
       activeEl.style.height = `${Math.max(34, c.W * 0.6)}px`;
@@ -402,7 +380,7 @@
         restStation.classList.remove('active');
         btnAttack.style.pointerEvents = 'auto';
         btnConfig.style.pointerEvents = 'auto';
-        guidance.innerHTML = `Target Active: Hit <strong style="color:${currentRole === 'ATTACK' ? '#ea580c' : '#94a3b8'}">[${currentRole}]</strong>`;
+        guidance.innerHTML = `Target Active: Hit <strong style="color:${currentRole === 'ATTACK' ? '#ea580c' : '#94a3b8'}">[${currentRole}]</strong> (A: ${conditions[condIndex].A}px, W: ${conditions[condIndex].W}px)`;
         
         startTimestamp = performance.now();
         cancelAnimationFrame(timerFrameId);
@@ -454,7 +432,7 @@
     }
 
     btnAttack.addEventListener('mousedown', () => handleTargetClick('ATTACK'));
-    btnConfig.addEventListener('mousedown', () => handleTargetClick('CONFIG'));
+    btnConfig.addEventListener('mousedown', () => handleTargetClick('CFG'));
 
     canvas.addEventListener('mousedown', (e) => {
       if (state === 'TARGET' && e.target === canvas) {
