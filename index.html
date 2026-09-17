@@ -29,20 +29,20 @@
     }
     button.btn:hover { background: #1d4ed8; }
     #start-circle {
-      position: absolute; width: 44px; height: 44px; border-radius: 50%;
+      position: absolute; width: 50px; height: 50px; border-radius: 50%;
       background: #10b981; transform: translate(-50%, -50%);
       cursor: pointer; display: none; align-items: center; justify-content: center;
-      font-size: 11px; font-weight: bold; color: white; z-index: 200;
+      font-size: 12px; font-weight: bold; color: white; z-index: 200;
       box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
     }
     #target-btn {
-      position: absolute; border-radius: 8px; cursor: pointer;
+      position: absolute; border-radius: 10px; cursor: pointer;
       display: none; align-items: center; justify-content: center;
-      font-size: 12px; font-weight: bold; color: white; z-index: 200;
+      font-size: 16px; font-weight: bold; color: white; z-index: 200;
       transform: translate(-50%, -50%);
     }
-    .normal-target { background: #3b82f6; border: 1px solid #60a5fa; }
-    .safeguard-target { background: #ef4444; border: 1px solid #f87171; }
+    .normal-target { background: #3b82f6; border: 2px solid #60a5fa; }
+    .safeguard-target { background: #ef4444; border: 2px solid #f87171; }
   </style>
 </head>
 <body>
@@ -50,7 +50,7 @@
     <h2>Anti-Accidental Activation Study</h2>
     <p>Press <strong>F11</strong> for Fullscreen mode. Click the green <strong>START</strong> anchor, then acquire the <strong>TARGET</strong> button as quickly and accurately as possible.</p>
     <div class="status-row"><span>Status:</span><strong id="condition-text">Ready</strong></div>
-    <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 36</strong></div>
+    <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 24</strong></div>
     <button id="start-btn" class="btn" onclick="startExperiment()">Start Experiment</button>
     <button id="export-btn" class="btn" style="display:none; background:#059669;" onclick="exportCSV()">Download Dataset (CSV)</button>
   </div>
@@ -59,12 +59,13 @@
   <div id="target-btn" onclick="handleTargetClick()">CONFIRM</div>
 
   <script>
-    // 放大 Safeguard 按鈕 (32px, 48px)，微調 Standard (72px, 96px)
+    // 尺寸大幅放大倍增：Standard (120px, 200px)、Safeguard (60px, 90px)
+    // 距離梯度大幅拉開：180px 到 620px
     const conditions = [
-      { type: "Standard_UI", D: [220, 340, 460], W: [72, 96] },
-      { type: "Safeguard_UI", D: [220, 340, 460], W: [32, 48] }
+      { type: "Standard_UI", D: [180, 360, 560], W: [120, 200] },
+      { type: "Safeguard_UI", D: [220, 420, 620], W: [60, 90] }
     ];
-    const repeats = 3;
+    const repeats = 2; // 總題數降至 24 題，不累且數據穩
 
     let trials = [];
     let currentIndex = -1;
@@ -108,7 +109,7 @@
       const start = document.getElementById("start-circle");
 
       const centerX = winW / 2;
-      const startY = 120;
+      const startY = 100;
       const targetY = startY + trial.D;
 
       start.style.left = `${centerX}px`;
@@ -116,7 +117,7 @@
       start.style.display = "flex";
 
       target.className = trial.type === "Safeguard_UI" ? "safeguard-target" : "normal-target";
-      target.innerText = trial.type === "Safeguard_UI" ? "DEL" : "SAVE";
+      target.innerText = trial.type === "Safeguard_UI" ? "DELETE" : "SAVE";
       target.style.width = `${trial.W}px`;
       target.style.height = `${trial.W}px`;
       target.style.left = `${centerX}px`;
