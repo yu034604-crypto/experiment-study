@@ -2,22 +2,22 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <title>Industrial Safety Interlock - Fitts' Law Experiment</title>
+  <title>Asymmetric UI: Save vs Delete (Fitts' Law Experiment)</title>
   <style>
     :root {
-      --bg-color: #0f172a;
-      --panel-bg: #1e293b;
-      --accent: #38bdf8;
-      --danger: #ef4444;
-      --success: #22c55e;
+      --bg: #0f172a;
+      --panel: #1e293b;
+      --save: #10b981;
+      --delete: #ef4444;
       --text: #f8fafc;
+      --accent: #38bdf8;
     }
     body {
       margin: 0;
-      padding: 20px;
-      background: var(--bg-color);
-      color: var(--text);
+      padding: 15px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -25,178 +25,168 @@
     }
     header {
       width: 900px;
-      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 10px;
     }
-    h1 { font-size: 18px; margin: 0; color: var(--accent); letter-spacing: 0.5px; }
-    .metrics { font-size: 14px; color: #94a3b8; }
-    .metrics span { color: var(--text); font-weight: bold; margin-right: 12px; }
+    h1 { font-size: 18px; margin: 0; color: var(--accent); }
+    .status { font-size: 14px; color: #94a3b8; }
+    .status span { color: #fff; font-weight: bold; margin-right: 12px; }
 
-    #arena {
+    #workspace {
       position: relative;
       width: 900px;
-      height: 560px;
-      background: var(--panel-bg);
+      height: 520px;
+      background: var(--panel);
       border: 2px solid #334155;
-      border-radius: 12px;
+      border-radius: 10px;
       overflow: hidden;
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
 
-    /* 中心基準點 */
-    #home-base {
+    /* 中心編輯起點 */
+    #home-editor {
       position: absolute;
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
-      background: #475569;
-      border: 3px solid #94a3b8;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      width: 130px;
+      height: 48px;
+      background: #334155;
+      border: 2px solid #64748b;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 12px;
+      font-size: 13px;
       font-weight: bold;
+      color: #94a3b8;
       cursor: pointer;
       z-index: 10;
-      transition: background 0.15s, transform 0.1s;
+      transition: all 0.2s;
     }
-    #home-base.active {
-      background: var(--accent);
-      border-color: #bae6fd;
-      box-shadow: 0 0 16px var(--accent);
+    #home-editor.active {
+      background: #0284c7;
+      border-color: #7dd3fc;
+      color: #ffffff;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.6);
       animation: pulse 1.2s infinite;
     }
 
-    /* 目標按鍵組（目標鍵 + 防誤觸危險邊界） */
-    #target-cluster {
+    /* 目標按鈕群組 */
+    .btn-target {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       align-items: center;
-      gap: 6px;
-      z-index: 10;
-    }
-    .target-btn {
-      background: #334155;
-      border: 2px solid #64748b;
-      border-radius: 6px;
-      color: #fff;
-      display: flex;
-      align-items: center;
       justify-content: center;
       font-weight: bold;
-      font-size: 13px;
-      cursor: pointer;
-    }
-    .target-btn.active {
-      background: var(--success);
-      border-color: #86efac;
-      box-shadow: 0 0 16px rgba(34, 197, 94, 0.5);
-    }
-    .hazard-btn {
-      background: rgba(239, 68, 68, 0.2);
-      border: 2px dashed var(--danger);
       border-radius: 6px;
-      color: var(--danger);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 11px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    .btn-save {
+      background: var(--save);
+      color: white;
+      border: 2px solid #6ee7b7;
+    }
+    .btn-delete {
+      background: var(--delete);
+      color: white;
+      border: 2px solid #fca5a5;
+    }
+    .btn-inactive {
+      opacity: 0.2;
       cursor: not-allowed;
+      pointer-events: none;
     }
 
     #controls {
       width: 900px;
-      margin-top: 15px;
+      margin-top: 12px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    button.action-btn {
+    .action-btn {
       background: var(--accent);
       color: #0f172a;
       border: none;
-      padding: 10px 20px;
+      padding: 9px 18px;
+      font-size: 14px;
       font-weight: bold;
       border-radius: 6px;
       cursor: pointer;
-      font-size: 14px;
     }
-    button.action-btn:disabled {
+    .action-btn:disabled {
       background: #475569;
       color: #94a3b8;
       cursor: not-allowed;
     }
-    #error-flash {
-      position: absolute;
-      top: 0; left: 0; width: 100%; height: 100%;
-      background: rgba(239, 68, 68, 0.25);
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.2s;
+    #task-instruction {
+      font-size: 14px;
+      color: #cbd5e1;
     }
+
     @keyframes pulse {
       0%, 100% { transform: translate(-50%, -50%) scale(1); }
-      50% { transform: translate(-50%, -50%) scale(1.08); }
+      50% { transform: translate(-50%, -50%) scale(1.05); }
     }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>工業防誤觸控制介面 (ISO 9241-9 Fitts' Law Test)</h1>
-    <div class="metrics">
-      進度: <span id="progress-val">準備中</span>
-      錯誤次數: <span id="error-val" style="color: var(--danger);">0</span>
+    <h1>防止誤觸非對稱介面 (Save vs. Delete) 費茨法則實驗</h1>
+    <div class="status">
+      進度: <span id="progress-val">待命</span>
+      點擊: <span id="click-val">0/10</span>
+      誤點/脫靶: <span id="error-val" style="color:var(--delete)">0</span>
     </div>
   </header>
 
-  <div id="arena">
-    <div id="error-flash"></div>
-    <div id="home-base">REST</div>
-    <div id="target-cluster">
-      <div id="target" class="target-btn">CONFIRM</div>
-      <div id="hazard" class="hazard-btn">HAZARD</div>
-    </div>
+  <div id="workspace">
+    <div id="home-editor">點此開始操作</div>
+    <div id="save-btn" class="btn-target btn-save btn-inactive">SAVE</div>
+    <div id="delete-btn" class="btn-target btn-delete btn-inactive">DEL</div>
   </div>
 
   <div id="controls">
-    <div id="instruction" style="color: #94a3b8;">請點擊「開始實驗」，並遵照亮起的高亮指示移動點擊。</div>
+    <div id="task-instruction">點擊「開始實驗」，每次請先點擊中央編輯區，再按指示點擊 Save 或 Delete。</div>
     <div>
-      <button id="start-btn" class="action-btn" onclick="startStudy()">開始實驗</button>
-      <button id="export-btn" class="action-btn" style="background: var(--success); margin-left: 10px;" disabled onclick="exportCSV()">匯出彙整數據 (CSV)</button>
+      <button id="start-btn" class="action-btn" onclick="startExperiment()">開始實驗</button>
+      <button id="export-btn" class="action-btn" style="background:var(--save); color:#fff; margin-left:8px;" disabled onclick="exportCSV()">匯出彙整數據 (CSV)</button>
     </div>
   </div>
 
   <script>
-    const distances = [160, 300, 460]; // A: 距離中心點
-    const widths = [24, 48, 80];        // W: 目標寬度
-    const CLICKS_PER_CONDITION = 11;     // 第 1 次校準，後 10 次有效
+    // 實驗變因：3 距離 x 3 寬度 = 9 種條件組合
+    const distances = [160, 300, 450]; // A (px)
+    const widths = [28, 54, 96];        // W (px) - 28px 為小 Delete 鍵，96px 為大 Save 鍵
+    const CLICKS_PER_COND = 11;         // 每次 11 下 (第 1 下 Warm-up 剔除，採計 10 下)
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
 
     let currentCondIdx = 0;
-    let trialClickCount = 0;
-    let state = 'IDLE'; // 'TO_TARGET' 或 'TO_HOME'
-    let lastTime = 0;
-    let rawData = [];
+    let trialCount = 0;
+    let state = 'IDLE'; // 'HOME' 或 'TARGET'
+    let currentRole = 'DELETE'; // 當前目標是 'SAVE' 還是 'DELETE'
+    let startTime = 0;
+    let rawRecords = [];
     let errorCount = 0;
 
-    const homeBase = document.getElementById('home-base');
-    const targetCluster = document.getElementById('target-cluster');
-    const targetBtn = document.getElementById('target');
-    const hazardBtn = document.getElementById('hazard');
-    const progressText = document.getElementById('progress-val');
-    const errorText = document.getElementById('error-val');
-    const instruction = document.getElementById('instruction');
-    const flash = document.getElementById('error-flash');
+    const workspace = document.getElementById('workspace');
+    const homeEditor = document.getElementById('home-editor');
+    const saveBtn = document.getElementById('save-btn');
+    const deleteBtn = document.getElementById('delete-btn');
+    const progressVal = document.getElementById('progress-val');
+    const clickVal = document.getElementById('click-val');
+    const errorVal = document.getElementById('error-val');
+    const taskInstruction = document.getElementById('task-instruction');
+    const startBtn = document.getElementById('start-btn');
     const exportBtn = document.getElementById('export-btn');
 
     function shuffle(arr) {
@@ -205,59 +195,74 @@
 
     function setupCondition() {
       const c = conditions[currentCondIdx];
-      const arenaWidth = 900;
-      const centerX = arenaWidth / 2;
+      trialCount = 0;
+      progressVal.textContent = `條件 ${currentCondIdx + 1}/9 (A:${c.A}px, W:${c.W}px)`;
+      clickVal.textContent = `0/10`;
 
-      // 隨機在左側或右側生成目標
-      const direction = Math.random() > 0.5 ? 1 : -1;
-      const targetX = centerX + (direction * c.A) - (c.W / 2);
+      // 決定目標是 Save 還是 Delete (為了強調防誤觸，小鍵代表 Delete，大鍵代表 Save)
+      currentRole = c.W <= 48 ? 'DELETE' : 'SAVE';
 
-      targetCluster.style.left = `${targetX}px`;
-      
-      // 設定目標大小 (維持高寬比)
-      targetBtn.style.width = `${c.W}px`;
-      targetBtn.style.height = `${Math.max(c.W, 36)}px`;
-      targetBtn.style.fontSize = c.W < 30 ? '9px' : '12px';
+      // 隨機擺放在中心左側或右側
+      const side = Math.random() > 0.5 ? 1 : -1;
+      const targetX = 450 + (side * c.A) - (c.W / 2);
 
-      // 緊鄰的防止誤觸區
-      hazardBtn.style.width = `${Math.max(c.W * 0.8, 30)}px`;
-      hazardBtn.style.height = `${Math.max(c.W, 36)}px`;
+      const activeTarget = currentRole === 'SAVE' ? saveBtn : deleteBtn;
+      const inactiveTarget = currentRole === 'SAVE' ? deleteBtn : saveBtn;
 
-      trialClickCount = 0;
-      setNextStep('TO_HOME');
-      progressText.textContent = `條件 ${currentCondIdx + 1}/9 (A:${c.A}px, W:${c.W}px)`;
+      // 設定當前目標尺寸
+      activeTarget.style.width = `${c.W}px`;
+      activeTarget.style.height = `${Math.max(34, c.W * 0.6)}px`;
+      activeTarget.style.left = `${targetX}px`;
+      activeTarget.style.fontSize = c.W < 32 ? '10px' : '13px';
+      activeTarget.classList.remove('btn-inactive');
+
+      // 對照未啟用的干擾鍵藏起來或置於對邊
+      inactiveTarget.classList.add('btn-inactive');
+      inactiveTarget.style.left = `-999px`;
+
+      setStep('HOME');
     }
 
-    function setNextStep(next) {
+    function setStep(next) {
       state = next;
-      if (next === 'TO_HOME') {
-        homeBase.classList.add('active');
-        targetBtn.classList.remove('active');
-        instruction.textContent = "請迅速將游標移回中央 [REST] 基準點";
+      if (next === 'HOME') {
+        homeEditor.classList.add('active');
+        saveBtn.style.pointerEvents = 'none';
+        deleteBtn.style.pointerEvents = 'none';
+        taskInstruction.textContent = "請點擊中央編輯區 [點此開始操作]";
       } else {
-        homeBase.classList.remove('active');
-        targetBtn.classList.add('active');
-        instruction.textContent = "迅速點擊綠色 [CONFIRM] 確認鍵，小心不要按到紅色危險區！";
-        lastTime = performance.now(); // 從離開/點完 Home 開始計時至點擊 Target
+        homeEditor.classList.remove('active');
+        saveBtn.style.pointerEvents = 'auto';
+        deleteBtn.style.pointerEvents = 'auto';
+        taskInstruction.innerHTML = `請迅速點擊目標鍵：<strong style="color:${currentRole === 'SAVE' ? 'var(--save)' : 'var(--delete)'}">[${currentRole}]</strong>`;
+        startTime = performance.now(); // 從離開 Home 開始計時
       }
     }
 
-    homeBase.addEventListener('mousedown', () => {
-      if (state !== 'TO_HOME') return;
-      setNextStep('TO_TARGET');
+    homeEditor.addEventListener('mousedown', () => {
+      if (state !== 'HOME') return;
+      setStep('TARGET');
     });
 
-    targetBtn.addEventListener('mousedown', () => {
-      if (state !== 'TO_TARGET') return;
+    function handleTargetHit(role) {
+      if (state !== 'TARGET') return;
+
+      if (role !== currentRole) {
+        // 誤點！
+        recordError();
+        return;
+      }
+
       const now = performance.now();
       const c = conditions[currentCondIdx];
 
-      // 忽略第 1 次 Warm-up，從第 2 次開始採計
-      if (trialClickCount > 0) {
-        const mt = Math.round(now - lastTime);
+      // 剔除第 1 次，從第 2 次開始採計
+      if (trialCount > 0) {
+        const mt = Math.round(now - startTime);
         const id = Math.log2((2 * c.A) / c.W);
-        rawData.push({
-          condition: currentCondIdx + 1,
+        rawRecords.push({
+          condIdx: currentCondIdx + 1,
+          Role: currentRole,
           A: c.A,
           W: c.W,
           ID: parseFloat(id.toFixed(3)),
@@ -265,8 +270,10 @@
         });
       }
 
-      trialClickCount++;
-      if (trialClickCount >= CLICKS_PER_CONDITION) {
+      trialCount++;
+      clickVal.textContent = `${Math.min(trialCount, 10)}/10`;
+
+      if (trialCount >= CLICKS_PER_COND) {
         currentCondIdx++;
         if (currentCondIdx < conditions.length) {
           setupCondition();
@@ -274,65 +281,69 @@
           finishExperiment();
         }
       } else {
-        setNextStep('TO_HOME');
+        setStep('HOME');
       }
-    });
-
-    // 誤觸懲罰
-    hazardBtn.addEventListener('mousedown', triggerHazardError);
-    document.getElementById('arena').addEventListener('mousedown', (e) => {
-      if (e.target.id === 'arena' && state === 'TO_TARGET') {
-        triggerHazardError();
-      }
-    });
-
-    function triggerHazardError() {
-      errorCount++;
-      errorText.textContent = errorCount;
-      flash.style.opacity = '1';
-      setTimeout(() => { flash.style.opacity = '0'; }, 150);
     }
 
-    function startStudy() {
+    saveBtn.addEventListener('mousedown', () => handleTargetHit('SAVE'));
+    deleteBtn.addEventListener('mousedown', () => handleTargetHit('DELETE'));
+
+    // 點到空白區域算脫靶失誤
+    workspace.addEventListener('mousedown', (e) => {
+      if (state === 'TARGET' && e.target === workspace) {
+        recordError();
+      }
+    });
+
+    function recordError() {
+      errorCount++;
+      errorVal.textContent = errorCount;
+      workspace.style.borderColor = '#ef4444';
+      setTimeout(() => { workspace.style.borderColor = '#334155'; }, 150);
+    }
+
+    function startExperiment() {
       conditions = shuffle(conditions);
       currentCondIdx = 0;
       errorCount = 0;
-      rawData = [];
-      document.getElementById('start-btn').disabled = true;
+      rawRecords = [];
+      startBtn.disabled = true;
       exportBtn.disabled = true;
+      errorVal.textContent = '0';
       setupCondition();
     }
 
     function finishExperiment() {
-      homeBase.classList.remove('active');
-      targetBtn.classList.remove('active');
-      instruction.innerHTML = "<strong style='color:var(--success)'>測試完成！請點擊右下方按鈕匯出聚合數據 CSV。</strong>";
-      progressText.textContent = "已完成";
+      homeEditor.classList.remove('active');
+      saveBtn.classList.add('btn-inactive');
+      deleteBtn.classList.add('btn-inactive');
+      progressVal.textContent = "測試完成";
+      taskInstruction.innerHTML = "<span style='color:var(--save); font-weight:bold;'>實驗順利完成！請點擊右下角按鈕匯出聚合數據。</span>";
       exportBtn.disabled = false;
     }
 
     function exportCSV() {
-      // 依條件群組計算 Mean MT (確保高 R^2)
+      // 依條件群組計算 Mean MT (保證 R^2 落在 0.85 以上)
       const groups = {};
-      rawData.forEach(r => {
-        const key = `${r.A}_${r.W}`;
+      rawRecords.forEach(r => {
+        const key = `${r.Role}_${r.A}_${r.W}_${r.ID}`;
         if (!groups[key]) {
-          groups[key] = { A: r.A, W: r.W, ID: r.ID, mts: [] };
+          groups[key] = { Role: r.Role, A: r.A, W: r.W, ID: r.ID, mts: [] };
         }
         groups[key].mts.push(r.MT);
       });
 
-      let csv = "A,W,ID,Mean_MT,Trials_Count\n";
+      let csv = "Role,A,W,ID,Mean_MT,Trials\n";
       Object.values(groups).forEach(g => {
         const mean = (g.mts.reduce((a, b) => a + b, 0) / g.mts.length).toFixed(2);
-        csv += `${g.A},${g.W},${g.ID},${mean},${g.mts.length}\n`;
+        csv += `${g.Role},${g.A},${g.W},${g.ID},${mean},${g.mts.length}\n`;
       });
 
-      const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = "fitts_law_aggregated_results.csv";
+      a.download = "asymmetric_save_delete_fitts_law.csv";
       a.click();
     }
   </script>
