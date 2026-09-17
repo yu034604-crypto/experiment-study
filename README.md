@@ -44,7 +44,7 @@ Standard HCI design guidelines often assume that all on-screen elements should b
 ()
 
 ### Regression Scatter Plot
-<img width="752" height="452" alt="image" src="https://github.com/user-attachments/assets/8a287009-de6a-4532-8a90-30df6cf64344" />
+<img width="845" height="554" alt="image" src="https://github.com/user-attachments/assets/eb3371ea-3117-4202-ad82-734a43f1e531" />
 
 
 ### Custom Fitts' Law Formula
