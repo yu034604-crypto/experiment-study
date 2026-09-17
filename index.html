@@ -2,284 +2,279 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Action Game HUD: Anti-Misclick Fitts' Law Study</title>
+  <title>Game HUD Fitts' Law Study</title>
   <style>
     :root {
-      --bg-dark: #090d16;
-      --hud-panel: #131b2e;
-      --attack-glow: #f97316;
-      --attack-btn: #ea580c;
-      --setting-btn: #475569;
-      --setting-glow: #94a3b8;
+      --bg: #0b0f19;
+      --panel: #111827;
+      --panel-border: #1f2937;
+      --attack: #ea580c;
+      --audio: #475569;
+      --text: #f3f4f6;
+      --muted: #9ca3af;
       --accent: #38bdf8;
-      --text-main: #f1f5f9;
       --danger: #ef4444;
-      --success: #22c55e;
+      --success: #10b981;
     }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       margin: 0;
-      padding: 20px;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-      background: var(--bg-dark);
-      color: var(--text-main);
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       display: flex;
       flex-direction: column;
       align-items: center;
       user-select: none;
     }
-    header {
+
+    /* Top Stats Bar */
+    #top-bar {
       width: 900px;
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      margin-bottom: 12px;
+      gap: 20px;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 8px;
     }
-    h1 {
-      font-size: 20px;
-      margin: 0;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: var(--accent);
-    }
-    .hud-stats {
-      font-size: 14px;
-      color: #94a3b8;
-    }
-    .hud-stats span {
+    #top-bar span {
       color: #fff;
-      font-weight: bold;
-      margin-right: 12px;
+      font-weight: 600;
     }
 
+    /* Main Interaction Canvas */
     #game-canvas {
       position: relative;
       width: 900px;
       height: 520px;
-      background: var(--hud-panel);
-      border: 2px solid #1e293b;
-      border-radius: 12px;
+      background: var(--panel);
+      border: 1px solid var(--panel-border);
+      border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.7);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
     }
 
-    /* Joystick / Rest Position */
+    /* Center Rest / Origin Station */
     #rest-station {
       position: absolute;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       width: 140px;
-      height: 50px;
-      background: #1e293b;
-      border: 2px solid #334155;
-      border-radius: 8px;
+      height: 48px;
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 13px;
-      font-weight: bold;
-      color: #94a3b8;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      color: var(--muted);
       cursor: pointer;
       z-index: 10;
       transition: all 0.15s ease;
     }
-    #rest-station.ready {
+    #rest-station.active {
       background: #0284c7;
       border-color: #38bdf8;
       color: #ffffff;
-      box-shadow: 0 0 18px rgba(56, 189, 248, 0.8);
-      animation: pulse-hud 1.2s infinite alternate;
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
     }
 
     /* Target Buttons */
-    .hud-btn {
+    .hud-target {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: 800;
+      font-weight: 700;
       border-radius: 6px;
       cursor: pointer;
-      transition: transform 0.05s;
+      transition: transform 0.05s ease;
     }
-    .hud-btn:active {
+    .hud-target:active {
       transform: translateY(-50%) scale(0.96);
     }
 
-    /* Attack Button (Large W) */
-    .btn-attack {
-      background: linear-gradient(135deg, #f97316, #c2410c);
+    .target-attack {
+      background: var(--attack);
       color: #ffffff;
-      border: 2px solid #fdba74;
-      box-shadow: 0 0 14px rgba(249, 115, 22, 0.4);
-      letter-spacing: 1px;
+      border: 1px solid #fdba74;
+      box-shadow: 0 0 12px rgba(234, 88, 12, 0.35);
+    }
+    .target-audio {
+      background: var(--audio);
+      color: #e2e8f0;
+      border: 1px solid #64748b;
+      box-shadow: 0 0 8px rgba(100, 116, 139, 0.2);
     }
 
-    /* Settings Button (Small W to prevent accidental clicks) */
-    .btn-settings {
-      background: #334155;
-      color: #cbd5e1;
-      border: 2px solid #64748b;
-      box-shadow: 0 0 8px rgba(100, 116, 139, 0.3);
-      letter-spacing: 0.5px;
-    }
-
-    .btn-inactive {
+    .hidden {
       display: none !important;
     }
 
-    #controls-bar {
+    /* Bottom Control Bar */
+    #bottom-bar {
       width: 900px;
       margin-top: 14px;
       display: flex;
       justify-content: space-between;
       align-items: center;
     }
-    .cmd-btn {
-      background: var(--accent);
-      color: #090d16;
+    #guidance {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .btn-action {
       border: none;
-      padding: 10px 20px;
-      font-size: 14px;
-      font-weight: bold;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
       border-radius: 6px;
       cursor: pointer;
     }
-    .cmd-btn:disabled {
-      background: #334155;
-      color: #64748b;
+    .btn-start {
+      background: var(--accent);
+      color: #0b0f19;
+    }
+    .btn-export {
+      background: var(--success);
+      color: #ffffff;
+      margin-left: 8px;
+    }
+    .btn-action:disabled {
+      background: #374151;
+      color: #6b7280;
       cursor: not-allowed;
-    }
-    .info-guide {
-      font-size: 14px;
-      color: #cbd5e1;
-    }
-
-    @keyframes pulse-hud {
-      from { transform: translate(-50%, -50%) scale(1); }
-      to { transform: translate(-50%, -50%) scale(1.06); }
     }
   </style>
 </head>
 <body>
 
-  <header>
-    <h1>Action Game HUD: Anti-Misclick Target Study</h1>
-    <div class="hud-stats">
-      Condition: <span id="cond-display">Ready</span>
-      Taps: <span id="tap-display">0/10</span>
-      Misses: <span id="miss-display" style="color:var(--danger)">0</span>
-    </div>
-  </header>
-
-  <div id="game-canvas">
-    <div id="rest-station">REST POSITION</div>
-    <div id="btn-attack" class="hud-btn btn-attack btn-inactive">ATTACK</div>
-    <div id="btn-settings" class="hud-btn btn-settings btn-inactive">AUDIO</div>
+  <!-- Minimal Stats Row -->
+  <div id="top-bar">
+    <div>Condition: <span id="lbl-cond">Idle</span></div>
+    <div>Trials: <span id="lbl-trials">0/10</span></div>
+    <div>Misses: <span id="lbl-miss" style="color:var(--danger)">0</span></div>
   </div>
 
-  <div id="controls-bar">
-    <div id="info-guide" class="info-guide">Click <strong>Start Experiment</strong> to initiate the session.</div>
+  <!-- Interactive Area -->
+  <div id="game-canvas">
+    <div id="rest-station">REST POSITION</div>
+    <div id="btn-attack" class="hud-target target-attack hidden">ATTACK</div>
+    <div id="btn-audio" class="hud-target target-audio hidden">AUDIO</div>
+  </div>
+
+  <!-- Footer Actions -->
+  <div id="bottom-bar">
+    <div id="guidance">Click <strong>Start Session</strong> to begin.</div>
     <div>
-      <button id="start-btn" class="cmd-btn" onclick="beginExperiment()">Start Experiment</button>
-      <button id="export-btn" class="cmd-btn" style="background:var(--success); color:#fff; margin-left:8px;" disabled onclick="exportAggregatedCSV()">Export Aggregated CSV</button>
+      <button id="btn-start" class="btn-action btn-start" onclick="initStudy()">Start Session</button>
+      <button id="btn-export" class="btn-action btn-export" disabled onclick="exportCSV()">Export Aggregated CSV</button>
     </div>
   </div>
 
   <script>
-    // Independent Variables: 3 Distances (A) x 3 Target Widths (W) = 9 Conditions
-    const distances = [160, 300, 460];  // A (px)
-    const widths = [28, 56, 100];       // W (px): 28px for Audio/Settings (Small), 100px for Attack (Large)
-    const TAPS_PER_CONDITION = 11;      // 1st click Warm-up (discarded), 10 valid recorded clicks
+    const distances = [160, 300, 460];
+    const widths = [28, 56, 100]; // 28px Audio (Small), 100px Attack (Large)
+    const TAPS_PER_COND = 11;     // 1st warmup dropped, 10 recorded
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
 
-    let currentCondIndex = 0;
-    let clickInCondition = 0;
-    let state = 'IDLE'; // 'REST' or 'ACTIVE_TARGET'
+    let condIndex = 0;
+    let clickCount = 0;
+    let state = 'IDLE';
     let currentRole = 'ATTACK';
-    let launchTime = 0;
+    let startTimestamp = 0;
     let rawRecords = [];
-    let missCount = 0;
+    let misses = 0;
 
-    const gameCanvas = document.getElementById('game-canvas');
+    const canvas = document.getElementById('game-canvas');
     const restStation = document.getElementById('rest-station');
     const btnAttack = document.getElementById('btn-attack');
-    const btnSettings = document.getElementById('btn-settings');
-    const condDisplay = document.getElementById('cond-display');
-    const tapDisplay = document.getElementById('tap-display');
-    const missDisplay = document.getElementById('miss-display');
-    const infoGuide = document.getElementById('info-guide');
-    const startBtn = document.getElementById('start-btn');
-    const exportBtn = document.getElementById('export-btn');
+    const btnAudio = document.getElementById('btn-audio');
+    const lblCond = document.getElementById('lbl-cond');
+    const lblTrials = document.getElementById('lbl-trials');
+    const lblMiss = document.getElementById('lbl-miss');
+    const guidance = document.getElementById('guidance');
+    const btnStart = document.getElementById('btn-start');
+    const btnExport = document.getElementById('btn-export');
 
-    function shuffleArray(arr) {
+    function shuffle(arr) {
       return arr.sort(() => Math.random() - 0.5);
     }
 
-    function setupCurrentCondition() {
-      const c = conditions[currentCondIndex];
-      clickInCondition = 0;
-      condDisplay.textContent = `${currentCondIndex + 1}/9 (A:${c.A}px, W:${c.W}px)`;
-      tapDisplay.textContent = `0/10`;
+    function setupCondition() {
+      const c = conditions[condIndex];
+      clickCount = 0;
+      lblCond.textContent = `${condIndex + 1}/9 (A:${c.A}px, W:${c.W}px)`;
+      lblTrials.textContent = `0/10`;
 
-      // W <= 56 represents Settings/Audio (Prevent Misclick); W = 100 represents Primary Attack
       currentRole = c.W <= 56 ? 'AUDIO' : 'ATTACK';
 
-      // Randomize target side: Left (-1) or Right (1)
       const side = Math.random() > 0.5 ? 1 : -1;
       const targetCenterX = 450 + (side * c.A);
 
-      const activeEl = currentRole === 'ATTACK' ? btnAttack : btnSettings;
-      const inactiveEl = currentRole === 'ATTACK' ? btnSettings : btnAttack;
+      const activeEl = currentRole === 'ATTACK' ? btnAttack : btnAudio;
+      const inactiveEl = currentRole === 'ATTACK' ? btnAudio : btnAttack;
 
       activeEl.style.width = `${c.W}px`;
       activeEl.style.height = `${Math.max(34, c.W * 0.65)}px`;
       activeEl.style.left = `${targetCenterX - (c.W / 2)}px`;
-      activeEl.style.fontSize = c.W < 35 ? '10px' : '13px';
-      activeEl.classList.remove('btn-inactive');
+      activeEl.style.fontSize = c.W < 35 ? '10px' : '12px';
+      activeEl.classList.remove('hidden');
 
-      inactiveEl.classList.add('btn-inactive');
+      inactiveEl.classList.add('hidden');
 
-      transitionTo('REST');
+      setStep('REST');
     }
 
-    function transitionTo(nextState) {
-      state = nextState;
-      if (nextState === 'REST') {
-        restStation.classList.add('ready');
+    function setStep(next) {
+      state = next;
+      if (next === 'REST') {
+        restStation.classList.add('active');
         btnAttack.style.pointerEvents = 'none';
-        btnSettings.style.pointerEvents = 'none';
-        infoGuide.textContent = "Click [REST POSITION] to ready your cursor.";
+        btnAudio.style.pointerEvents = 'none';
+        guidance.textContent = "Click [REST POSITION] to center cursor.";
       } else {
-        restStation.classList.remove('ready');
+        restStation.classList.remove('active');
         btnAttack.style.pointerEvents = 'auto';
-        btnSettings.style.pointerEvents = 'auto';
-        infoGuide.innerHTML = `Target Active: Hit <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack-glow)' : 'var(--setting-glow)'}">[${currentRole}]</strong>!`;
-        launchTime = performance.now();
+        btnAudio.style.pointerEvents = 'auto';
+        guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack)' : '#cbd5e1'}">[${currentRole}]</strong>`;
+        startTimestamp = performance.now();
       }
     }
 
     restStation.addEventListener('mousedown', () => {
       if (state !== 'REST') return;
-      transitionTo('ACTIVE_TARGET');
+      setStep('TARGET');
     });
 
-    function handleTargetHit(role) {
-      if (state !== 'ACTIVE_TARGET') return;
+    function handleTargetClick(role) {
+      if (state !== 'TARGET') return;
 
       const now = performance.now();
-      const c = conditions[currentCondIndex];
+      const c = conditions[condIndex];
 
-      // Discard the 1st tap (Warm-up/Initial indexing), record subsequent 10 taps
-      if (clickInCondition > 0) {
-        const mt = Math.round(now - launchTime);
+      // Exclude 1st warmup click
+      if (clickCount > 0) {
+        const mt = Math.round(now - startTimestamp);
         const id = Math.log2((2 * c.A) / c.W);
         rawRecords.push({
-          condIndex: currentCondIndex + 1,
+          condIndex: condIndex + 1,
           Role: currentRole,
           A: c.A,
           W: c.W,
@@ -288,77 +283,76 @@
         });
       }
 
-      clickInCondition++;
-      tapDisplay.textContent = `${Math.min(clickInCondition, 10)}/10`;
+      clickCount++;
+      lblTrials.textContent = `${Math.min(clickCount, 10)}/10`;
 
-      if (clickInCondition >= TAPS_PER_CONDITION) {
-        currentCondIndex++;
-        if (currentCondIndex < conditions.length) {
-          setupCurrentCondition();
+      if (clickCount >= TAPS_PER_COND) {
+        condIndex++;
+        if (condIndex < conditions.length) {
+          setupCondition();
         } else {
           finishStudy();
         }
       } else {
-        transitionTo('REST');
+        setStep('REST');
       }
     }
 
-    btnAttack.addEventListener('mousedown', () => handleTargetHit('ATTACK'));
-    btnSettings.addEventListener('mousedown', () => handleTargetHit('AUDIO'));
+    btnAttack.addEventListener('mousedown', () => handleTargetClick('ATTACK'));
+    btnAudio.addEventListener('mousedown', () => handleTargetClick('AUDIO'));
 
-    // Accidental clicks on blank canvas recorded as Misses
-    gameCanvas.addEventListener('mousedown', (e) => {
-      if (state === 'ACTIVE_TARGET' && e.target === gameCanvas) {
-        missCount++;
-        missDisplay.textContent = missCount;
-        gameCanvas.style.borderColor = '#ef4444';
-        setTimeout(() => { gameCanvas.style.borderColor = '#1e293b'; }, 150);
+    // Miss clicks on empty background
+    canvas.addEventListener('mousedown', (e) => {
+      if (state === 'TARGET' && e.target === canvas) {
+        misses++;
+        lblMiss.textContent = misses;
+        canvas.style.borderColor = '#ef4444';
+        setTimeout(() => { canvas.style.borderColor = '#1f2937'; }, 120);
       }
     });
 
-    function beginExperiment() {
-      conditions = shuffleArray(conditions);
-      currentCondIndex = 0;
-      missCount = 0;
+    function initStudy() {
+      conditions = shuffle(conditions);
+      condIndex = 0;
+      misses = 0;
       rawRecords = [];
-      startBtn.disabled = true;
-      exportBtn.disabled = true;
-      missDisplay.textContent = '0';
-      setupCurrentCondition();
+      btnStart.disabled = true;
+      btnExport.disabled = true;
+      lblMiss.textContent = '0';
+      setupCondition();
     }
 
     function finishStudy() {
-      restStation.classList.remove('ready');
-      btnAttack.classList.add('btn-inactive');
-      btnSettings.classList.add('btn-inactive');
-      condDisplay.textContent = "Completed";
-      infoGuide.innerHTML = "<span style='color:var(--success); font-weight:bold;'>Experiment Complete! Click Export to download aggregated CSV data.</span>";
-      exportBtn.disabled = false;
+      restStation.classList.remove('active');
+      btnAttack.classList.add('hidden');
+      btnAudio.classList.add('hidden');
+      lblCond.textContent = "Completed";
+      guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Export aggregated data below.</span>";
+      btnExport.disabled = false;
     }
 
-    function exportAggregatedCSV() {
-      // Group by Condition to calculate Mean MT (guarantees robust R^2)
-      const conditionMap = {};
+    function exportCSV() {
+      const map = {};
       rawRecords.forEach(r => {
         const key = `${r.Role}_${r.A}_${r.W}_${r.ID}`;
-        if (!conditionMap[key]) {
-          conditionMap[key] = { Role: r.Role, A: r.A, W: r.W, ID: r.ID, mts: [] };
+        if (!map[key]) {
+          map[key] = { Role: r.Role, A: r.A, W: r.W, ID: r.ID, mts: [] };
         }
-        conditionMap[key].mts.push(r.MT);
+        map[key].mts.push(r.MT);
       });
 
       let csv = "Role,A,W,ID,Mean_MT,Trials\n";
-      Object.values(conditionMap).forEach(group => {
-        const mean = (group.mts.reduce((sum, v) => sum + v, 0) / group.mts.length).toFixed(2);
-        csv += `${group.Role},${group.A},${group.W},${group.ID},${mean},${group.mts.length}\n`;
+      Object.values(map).forEach(g => {
+        const mean = (g.mts.reduce((sum, v) => sum + v, 0) / g.mts.length).toFixed(2);
+        csv += `${g.Role},${g.A},${g.W},${g.ID},${mean},${g.mts.length}\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const dlLink = document.createElement('a');
-      dlLink.href = url;
-      dlLink.download = "action_game_hud_fitts_law.csv";
-      dlLink.click();
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = "hud_fitts_law_aggregated.csv";
+      a.click();
     }
   </script>
 </body>
