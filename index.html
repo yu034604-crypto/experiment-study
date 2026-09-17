@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fitts' Law: Screen Edge vs. Floating Target</title>
+  <title>Fitts' Law Experiment: Screen-Edge vs. Floating Targets</title>
   <style>
     * {
       box-sizing: border-box;
@@ -25,19 +25,20 @@
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      padding: 24px 32px;
+      padding: 28px 36px;
       background: rgba(26, 26, 30, 0.95);
       border: 1px solid #33333a;
       border-radius: 12px;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       text-align: center;
       z-index: 1000;
-      width: 400px;
+      width: 420px;
     }
     #dashboard h2 {
       font-size: 20px;
       margin-bottom: 12px;
       color: #60a5fa;
+      font-weight: 600;
     }
     #dashboard p {
       font-size: 13px;
@@ -102,20 +103,20 @@
 </head>
 <body>
   <div id="dashboard">
-    <h2>Screen Edge Fitts' Law Test</h2>
-    <p>點擊綠色「起點」圓圈後，以最快速度直線往上點擊紅色「目標長條」。</p>
-    <div class="status-row"><span>目前階段:</span><strong id="condition-text">準備開始</strong></div>
-    <div class="status-row"><span>進度:</span><strong id="progress-text">0 / 54</strong></div>
-    <button id="start-btn" class="btn" onclick="startExperiment()">開始測試</button>
-    <button id="export-btn" class="btn" style="display:none; background:#059669;" onclick="exportCSV()">下載實驗數據 (CSV)</button>
+    <h2>Screen-Edge Fitts' Law Study</h2>
+    <p>Press <strong>F11</strong> for Fullscreen mode before starting. Click the green <strong>START</strong> anchor, then acquire the red <strong>TARGET</strong> bar as quickly and accurately as possible.</p>
+    <div class="status-row"><span>Status:</span><strong id="condition-text">Ready</strong></div>
+    <div class="status-row"><span>Progress:</span><strong id="progress-text">0 / 54</strong></div>
+    <button id="start-btn" class="btn" onclick="startExperiment()">Start Experiment</button>
+    <button id="export-btn" class="btn" style="display:none; background:#059669;" onclick="exportCSV()">Download Dataset (CSV)</button>
   </div>
 
-  <div id="start-circle" onclick="handleStartClick()">起點</div>
-  <div id="target-bar" onclick="handleTargetClick()">目標</div>
+  <div id="start-circle" onclick="handleStartClick()">START</div>
+  <div id="target-bar" onclick="handleTargetClick()">TARGET</div>
 
   <script>
-    const distances = [250, 420, 600];
-    const widths = [24, 48, 80];
+    const distances = [250, 420, 600]; // Movement distance in pixels (D)
+    const widths = [24, 48, 80];        // Target height in pixels (W)
     const conditions = ["Edge", "Floating"];
     const repeats = 3;
 
@@ -135,6 +136,7 @@
           });
         });
       });
+      // Random shuffle
       for (let i = trials.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [trials[i], trials[j]] = [trials[j], trials[i]];
@@ -190,6 +192,7 @@
       const movementTime = endTime - startTime;
       const trial = trials[currentIndex];
 
+      // Shannon formulation: ID = log2(D / W + 1)
       const id = Math.log2(trial.D / trial.W + 1);
 
       dataset.push({
@@ -209,7 +212,7 @@
     function completeExperiment() {
       const db = document.getElementById("dashboard");
       db.style.display = "block";
-      document.getElementById("condition-text").innerText = "已完成全部測試";
+      document.getElementById("condition-text").innerText = "Completed";
       document.getElementById("progress-text").innerText = `${dataset.length} / ${dataset.length}`;
       document.getElementById("start-btn").style.display = "none";
       document.getElementById("export-btn").style.display = "block";
