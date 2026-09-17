@@ -46,12 +46,12 @@ Standard HCI design guidelines often assume that all on-screen elements should b
 
 ### Custom Fitts' Law Formula
 Empirical regression derived from 9 randomized conditions (90 valid clicks aggregated into Mean Movement Time):
+
 $$MT = 57.64 + 139.21 \cdot \log_2\left(\frac{2A}{W}\right)$$
 
 * **Intercept ($a$):** $57.64\text{ ms}$ (baseline sensory-motor initiation delay)
 * **Slope ($b$):** $139.21\text{ ms/bit}$ (information processing rate)
 * **Coefficient of Determination ($R^2$):** $0.8483$ (demonstrating a robust fit to Fitts' Law)
-* **Throughput ($TP = 1/b$):** $\approx 7.18\text{ bits/s}$
 
 ### Empirical Discussion
 The empirical findings strongly validate the asymmetric layout:
