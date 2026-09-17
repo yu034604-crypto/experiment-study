@@ -5,13 +5,12 @@
   <title>Game HUD Fitts' Law Study</title>
   <style>
     :root {
-      --bg: #0b0f19;
+      --bg: #090d16;
       --panel: #111827;
-      --panel-border: #1f2937;
+      --border: #1f2937;
       --attack: #ea580c;
-      --attack-border: #fdba74;
-      --audio: #334155;
-      --audio-border: #64748b;
+      --attack-glow: #f97316;
+      --config: #374151;
       --text: #f3f4f6;
       --muted: #9ca3af;
       --accent: #38bdf8;
@@ -19,13 +18,11 @@
       --success: #10b981;
     }
 
-    * {
-      box-sizing: border-box;
-    }
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      padding: 24px;
+      padding: 20px;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -35,7 +32,7 @@
       user-select: none;
     }
 
-    /* Top Stats Bar */
+    /* Minimal Stats Bar (No big ugly title) */
     #top-bar {
       width: 900px;
       display: flex;
@@ -44,7 +41,7 @@
       gap: 20px;
       font-size: 13px;
       color: var(--muted);
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
     #top-bar span {
       color: #fff;
@@ -52,25 +49,25 @@
     }
 
     /* Main Interaction Canvas */
-    #game-canvas {
+    #canvas {
       position: relative;
       width: 900px;
-      height: 540px;
+      height: 520px;
       background: var(--panel);
-      border: 1px solid var(--panel-border);
+      border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
     }
 
-    /* Center Rest / Origin Station */
+    /* Center Rest Position */
     #rest-station {
       position: absolute;
-      top: 55%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 130px;
-      height: 46px;
+      width: 140px;
+      height: 48px;
       background: #1f2937;
       border: 1px solid #374151;
       border-radius: 6px;
@@ -79,7 +76,6 @@
       justify-content: center;
       font-size: 12px;
       font-weight: 700;
-      letter-spacing: 0.5px;
       color: var(--muted);
       cursor: pointer;
       z-index: 10;
@@ -107,22 +103,21 @@
       transform: scale(0.95);
     }
 
-    /* ATTACK Button: Highly visible, centered combat area */
+    /* Prominent Attack Button - Guaranteed safe inside canvas */
     .target-attack {
-      background: linear-gradient(135deg, #f97316, #ea580c);
+      background: linear-gradient(135deg, #ea580c, #c2410c);
       color: #ffffff;
-      border: 2px solid var(--attack-border);
-      box-shadow: 0 0 16px rgba(234, 88, 12, 0.45);
+      border: 2px solid #fdba74;
+      box-shadow: 0 0 16px rgba(234, 88, 12, 0.5);
       letter-spacing: 1px;
     }
 
-    /* SETTINGS Button: Compact, edge-positioned anti-misclick target */
-    .target-settings {
-      background: var(--audio);
-      color: #cbd5e1;
-      border: 1px solid var(--audio-border);
-      box-shadow: 0 0 8px rgba(100, 116, 139, 0.25);
-      letter-spacing: 0.5px;
+    /* Compact Config Button - Positioned near edges */
+    .target-config {
+      background: var(--config);
+      color: #94a3b8;
+      border: 1px solid #4b5563;
+      box-shadow: 0 0 6px rgba(0,0,0,0.4);
     }
 
     .hidden {
@@ -142,7 +137,7 @@
       color: var(--muted);
     }
 
-    .btn-action {
+    .btn {
       border: none;
       padding: 9px 18px;
       font-size: 13px;
@@ -152,52 +147,51 @@
     }
     .btn-start {
       background: var(--accent);
-      color: #0b0f19;
+      color: #090d16;
     }
     .btn-export {
       background: var(--success);
       color: #ffffff;
       margin-left: 8px;
     }
-    .btn-action:disabled {
-      background: #374151;
-      color: #6b7280;
+    .btn:disabled {
+      background: #1f2937;
+      color: #4b5563;
       cursor: not-allowed;
     }
   </style>
 </head>
 <body>
 
-  <!-- Top Stats Bar -->
+  <!-- Minimal Stats Bar (Top right only) -->
   <div id="top-bar">
     <div>Condition: <span id="lbl-cond">Idle</span></div>
     <div>Trials: <span id="lbl-trials">0/10</span></div>
     <div>Misses: <span id="lbl-miss" style="color:var(--danger)">0</span></div>
   </div>
 
-  <!-- Interactive Area -->
-  <div id="game-canvas">
+  <!-- Interactive Arena -->
+  <div id="canvas">
     <div id="rest-station">REST POSITION</div>
     <div id="btn-attack" class="hud-target target-attack hidden">ATTACK</div>
-    <div id="btn-settings" class="hud-target target-settings hidden">CONFIG</div>
+    <div id="btn-config" class="hud-target target-config hidden">CFG</div>
   </div>
 
-  <!-- Footer Actions -->
+  <!-- Controls Footer -->
   <div id="bottom-bar">
     <div id="guidance">Click <strong>Start Session</strong> to begin.</div>
     <div>
-      <button id="btn-start" class="btn-action btn-start" onclick="initStudy()">Start Session</button>
-      <button id="btn-export" class="btn-action btn-export" disabled onclick="exportCSV()">Export Aggregated CSV</button>
+      <button id="btn-start" class="btn btn-start" onclick="initStudy()">Start Session</button>
+      <button id="btn-export" class="btn btn-export" disabled onclick="exportCSV()">Export Aggregated CSV</button>
     </div>
   </div>
 
   <script>
-    // Independent Variables:
-    // A: Amplitude distance from center rest station
-    // W: Target width (Attack utilizes prominent W; Config utilizes small W)
-    const distances = [150, 260, 360];
-    const widths = [26, 52, 96]; // Small 26px (Config), Prominent 96px (Attack)
-    const TAPS_PER_COND = 11;    // 1st Warm-up discarded, 10 valid taps recorded
+    // Systematically controlled A & W (Guaranteed inside canvas)
+    // 9 Conditions: 3 Distances x 3 Widths
+    const distances = [140, 210, 280]; // A (px) - Safely contained within 900x520 canvas
+    const widths = [28, 54, 96];        // W (px): 28px for edge Config, 96px for Attack
+    const TAPS_PER_COND = 11;          // 1st Warm-up discarded, 10 valid trials recorded
 
     let conditions = [];
     distances.forEach(d => widths.forEach(w => conditions.push({ A: d, W: w })));
@@ -210,10 +204,10 @@
     let rawRecords = [];
     let misses = 0;
 
-    const canvas = document.getElementById('game-canvas');
+    const canvas = document.getElementById('canvas');
     const restStation = document.getElementById('rest-station');
     const btnAttack = document.getElementById('btn-attack');
-    const btnSettings = document.getElementById('btn-settings');
+    const btnConfig = document.getElementById('btn-config');
     const lblCond = document.getElementById('lbl-cond');
     const lblTrials = document.getElementById('lbl-trials');
     const lblMiss = document.getElementById('lbl-miss');
@@ -231,41 +225,40 @@
       lblCond.textContent = `${condIndex + 1}/9 (A:${c.A}px, W:${c.W}px)`;
       lblTrials.textContent = `0/10`;
 
-      // Small width represents peripheral Setting/Config; Large represents Primary Attack
-      currentRole = c.W <= 52 ? 'CONFIG' : 'ATTACK';
+      // Assign role: Large is ATTACK, Small/Medium can be CONFIG
+      currentRole = c.W >= 70 ? 'ATTACK' : 'CONFIG';
 
-      const activeEl = currentRole === 'ATTACK' ? btnAttack : btnSettings;
-      const inactiveEl = currentRole === 'ATTACK' ? btnSettings : btnAttack;
+      const activeEl = currentRole === 'ATTACK' ? btnAttack : btnConfig;
+      const inactiveEl = currentRole === 'ATTACK' ? btnConfig : btnAttack;
 
-      // Rest station center coordinates
-      const restCenterX = 450;
-      const restCenterY = 540 * 0.55;
+      const centerX = 450;
+      const centerY = 260;
 
       let targetX = 0;
       let targetY = 0;
 
       if (currentRole === 'ATTACK') {
-        // ATTACK: Kept within prominent combat field (comfortably offset from center, not touching canvas edges)
+        // ATTACK: Placed prominently in the central horizontal action zone (never cut off)
         const side = Math.random() > 0.5 ? 1 : -1;
-        targetX = restCenterX + (side * c.A) - (c.W / 2);
-        targetY = restCenterY - (c.W * 0.35);
+        targetX = centerX + (side * c.A) - (c.W / 2);
+        targetY = centerY - 25; // Balanced vertically with rest station
       } else {
-        // CONFIG: Biased towards the upper periphery/edge corner to simulate game setting icons
-        const cornerSide = Math.random() > 0.5 ? 1 : -1;
-        targetX = restCenterX + (cornerSide * c.A) - (c.W / 2);
-        // Positioned higher up near the edge
-        targetY = Math.max(30, restCenterY - c.A * 0.75);
+        // CONFIG: Positioned toward the corners or upper edge to simulate peripheral settings
+        const cornerX = Math.random() > 0.5 ? 1 : -1;
+        const cornerY = Math.random() > 0.5 ? -1 : 1;
+        targetX = centerX + (cornerX * c.A * 1.1) - (c.W / 2);
+        targetY = centerY + (cornerY * c.A * 0.7) - (c.W / 2);
       }
 
-      // Constrain within visible canvas boundaries
-      targetX = Math.max(15, Math.min(900 - c.W - 15, targetX));
-      targetY = Math.max(15, Math.min(540 - Math.max(30, c.W * 0.6) - 15, targetY));
+      // Strict boundaries to prevent clipping (margins of 20px)
+      targetX = Math.max(20, Math.min(900 - c.W - 20, targetX));
+      targetY = Math.max(20, Math.min(520 - 45 - 20, targetY));
 
       activeEl.style.width = `${c.W}px`;
-      activeEl.style.height = `${Math.max(30, c.W * 0.65)}px`;
+      activeEl.style.height = `${Math.max(32, c.W * 0.6)}px`;
       activeEl.style.left = `${targetX}px`;
       activeEl.style.top = `${targetY}px`;
-      activeEl.style.fontSize = c.W < 35 ? '9px' : '13px';
+      activeEl.style.fontSize = c.W < 35 ? '10px' : '13px';
       activeEl.classList.remove('hidden');
 
       inactiveEl.classList.add('hidden');
@@ -278,13 +271,13 @@
       if (next === 'REST') {
         restStation.classList.add('active');
         btnAttack.style.pointerEvents = 'none';
-        btnSettings.style.pointerEvents = 'none';
+        btnConfig.style.pointerEvents = 'none';
         guidance.textContent = "Click [REST POSITION] to center cursor.";
       } else {
         restStation.classList.remove('active');
         btnAttack.style.pointerEvents = 'auto';
-        btnSettings.style.pointerEvents = 'auto';
-        guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack)' : '#cbd5e1'}">[${currentRole}]</strong>`;
+        btnConfig.style.pointerEvents = 'auto';
+        guidance.innerHTML = `Target: Click <strong style="color:${currentRole === 'ATTACK' ? 'var(--attack-glow)' : '#cbd5e1'}">[${currentRole}]</strong>`;
         startTimestamp = performance.now();
       }
     }
@@ -300,7 +293,7 @@
       const now = performance.now();
       const c = conditions[condIndex];
 
-      // Discard 1st warmup click; accumulate remaining 10 valid trials
+      // Drop first warm-up trial
       if (clickCount > 0) {
         const mt = Math.round(now - startTimestamp);
         const id = Math.log2((2 * c.A) / c.W);
@@ -330,9 +323,9 @@
     }
 
     btnAttack.addEventListener('mousedown', () => handleTargetClick('ATTACK'));
-    btnSettings.addEventListener('mousedown', () => handleTargetClick('CONFIG'));
+    btnConfig.addEventListener('mousedown', () => handleTargetClick('CONFIG'));
 
-    // Accidental clicks on empty canvas background
+    // Miss clicks on background
     canvas.addEventListener('mousedown', (e) => {
       if (state === 'TARGET' && e.target === canvas) {
         misses++;
@@ -356,7 +349,7 @@
     function finishStudy() {
       restStation.classList.remove('active');
       btnAttack.classList.add('hidden');
-      btnSettings.classList.add('hidden');
+      btnConfig.classList.add('hidden');
       lblCond.textContent = "Completed";
       guidance.innerHTML = "<span style='color:var(--success); font-weight:600;'>Session complete. Export aggregated data below.</span>";
       btnExport.disabled = false;
@@ -380,10 +373,10 @@
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = "action_game_hud_fitts_law.csv";
-      a.click();
+      const dlLink = document.createElement('a');
+      dlLink.href = url;
+      dlLink.download = "action_game_hud_fitts_law.csv";
+      dlLink.click();
     }
   </script>
 </body>
