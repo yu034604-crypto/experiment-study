@@ -41,7 +41,7 @@ Standard HCI design guidelines often assume that all on-screen elements should b
 
 ### Video Demonstration
 <!-- Embed your recorded screen trial video or insert your YouTube link below -->
-https://github.com/user-attachments/assets/8ce11e26-7a43-4130-9949-f47b2f64c691
+https://github.com/user-attachments/assets/0947ef0f-3856-4319-8ae2-f88e9ce392b0
 
 ### Regression Scatter Plot
 <img width="500" height="350" alt="image" src="https://github.com/user-attachments/assets/eb3371ea-3117-4202-ad82-734a43f1e531" />
