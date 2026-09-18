@@ -1,7 +1,7 @@
 # Fitts's law experiment study
 This project investigates asymmetric touch target design in high-intensity mobile MOBA (Multiplayer Online Battle Arena) gaming using Fitts' Law. It empirically validates how sizing and spatial layout prevent game-losing accidental clicks during high-adrenaline combat.
 
-- **Live Experiment Application:** [https://yu034604-crypto.github.io/fitts-law-study/](https://yu034604-crypto.github.io/fitts-law-study/)
+- **Live Experiment Application:** [https://yu034604-crypto.github.io/experiment-study/)
 
 ---
 
